@@ -16,10 +16,10 @@ public class EchoThread implements Runnable {
     protected Socket socket;
     protected boolean isStopped;
 
-    public GenericServer(int port)
+    public EchoThread(int port)
     {
-    	isStopped = false;
-      this.port = port;
+        isStopped = false;
+        this.port = port;
     }
 
     public void run() {
