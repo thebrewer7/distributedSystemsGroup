@@ -29,32 +29,72 @@ public class EchoServer implements Runnable{
     }
 //Might need this below but I doubt it
     public void run(){
-       // Thread clientThread = Thread.currentThread();
+       Thread clientThread = Thread.currentThread();
     }
 
 }
 
-class EchoThread implements Runnable {
+class EchoThread implements Runnable
+{
     Socket client;
+    String line=null;
+    BufferedReader  is = null;
+    PrintWriter os=null;
 
     public EchoThread(Socket client) {
         this.client = client;
     }
 
     public void run() {
-        try {
-            PrintWriter toClient = new PrintWriter(client.getOutputStream());
-            BufferedReader fromClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            System.out.println("Thread is connected");
-
-//            System.out.println("Closing client socket");
-//            client.close();
-
-            //close input and output streams
-            toClient.close();
-            fromClient.close();
-        } catch (IOException e) {
-            System.out.println(e);
+      try
+      {
+        is= new BufferedReader(new InputStreamReader(client.getInputStream()));
+        os=new PrintWriter(client.getOutputStream());
+      }
+      catch(IOException e)
+      {
+        System.out.println("IO error in server thread");
+      }
+      try
+      {
+        line=is.readLine();
+        while(line.compareTo("QUIT")!=0)
+        {
+            os.println(line);
+            os.flush();
+            System.out.println("Response to Client  :  "+line);
+            line=is.readLine();
         }
+      }
+      catch (IOException e)
+      {
+        System.out.println("IO Error/ Client terminated abruptly");
+      }
+      finally
+      {
+        try
+        {
+          System.out.println("Connection Closing..");
+          if (is!=null)
+          {
+            is.close();
+            System.out.println(" Socket Input Stream Closed");
+          }
+          if(os!=null)
+          {
+            os.close();
+            System.out.println("Socket Out Closed");
+          }
+          if (client!=null)
+          {
+            client.close();
+            System.out.println("Socket Closed");
+          }
+        }
+        catch(IOException ie)
+        {
+          System.out.println("Socket Close Error");
+        }
+      }
     }
 }
