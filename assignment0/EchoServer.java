@@ -36,65 +36,68 @@ public class EchoServer implements Runnable{
 
 class EchoThread implements Runnable
 {
-    Socket client;
-    String line=null;
-    BufferedReader  is = null;
-    PrintWriter os=null;
+  Socket client;
+  String line = null;
+  BufferedReader  fromClient = null;
+  PrintWriter toClient = null;
 
-    public EchoThread(Socket client) {
-        this.client = client;
+  public EchoThread(Socket client)
+  {
+    this.client = client;
+  }
+
+  public void run()
+  {
+    try
+    {
+      fromClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
+      toClient =new PrintWriter(client.getOutputStream());
     }
-
-    public void run() {
-      try
+    catch(IOException e)
+    {
+      System.out.println("IO error in server thread");
+    }
+    try
+    {
+      line = fromClient.readLine();
+      while(line.compareTo("QUIT")!=0)
       {
-        is= new BufferedReader(new InputStreamReader(client.getInputStream()));
-        os=new PrintWriter(client.getOutputStream());
-      }
-      catch(IOException e)
-      {
-        System.out.println("IO error in server thread");
-      }
-      try
-      {
-        line=is.readLine();
-        while(line.compareTo("QUIT")!=0)
-        {
-            os.println(line);
-            os.flush();
-            System.out.println("Response to Client  :  "+line);
-            line=is.readLine();
-        }
-      }
-      catch (IOException e)
-      {
-        System.out.println("IO Error/ Client terminated abruptly");
-      }
-      finally
-      {
-        try
-        {
-          System.out.println("Connection Closing..");
-          if (is!=null)
-          {
-            is.close();
-            System.out.println(" Socket Input Stream Closed");
-          }
-          if(os!=null)
-          {
-            os.close();
-            System.out.println("Socket Out Closed");
-          }
-          if (client!=null)
-          {
-            client.close();
-            System.out.println("Socket Closed");
-          }
-        }
-        catch(IOException ie)
-        {
-          System.out.println("Socket Close Error");
-        }
+        line = line.replaceAll("[\\W\\d]", "");
+        toClient.println(line);
+        toClient.flush();
+        System.out.println("Response to Client  :  "+line);
+        line=fromClient.readLine();
       }
     }
+    catch (IOException e)
+    {
+      System.out.println("IO Error/ Client terminated abruptly");
+    }
+    finally
+    {
+      try
+      {
+        System.out.println("Connection Closing..");
+        if (fromClient!=null)
+        {
+          fromClient.close();
+          System.out.println(" Socket Input Stream Closed");
+        }
+        if(toClient!=null)
+        {
+          toClient.close();
+          System.out.println("Socket Out Closed");
+        }
+        if (client!=null)
+        {
+          client.close();
+          System.out.println("Socket Closed");
+        }
+      }
+      catch(IOException ie)
+      {
+        System.out.println("Socket Close Error");
+      }
+    }
+  }
 }
