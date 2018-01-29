@@ -60,13 +60,16 @@ class EchoThread implements Runnable
     try
     {
       line = fromClient.readLine();
-      while(line.compareTo("QUIT")!=0)
+      System.out.println("LINE BEFORE WHILE LOOP" + line + "\n");
+      while(line.compareToIgnoreCase("QUIT") != 0)
       {
         line = line.replaceAll("[\\W\\d]", "");
+        System.out.println("FIRST LINE IN WHILE LOOP" + line + "\n");
         toClient.println(line);
         toClient.flush();
         System.out.println("Response to Client  :  "+line);
         line=fromClient.readLine();
+        System.out.println("SECOND LINE IN WHILE LOOP" + line + "\n");
       }
     }
     catch (IOException e)
