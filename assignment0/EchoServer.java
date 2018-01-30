@@ -40,6 +40,8 @@ class EchoThread implements Runnable
     /*
         variables used to determine if user wants to quit
 
+        quitFlag indicates the user is in the progress of typing 'quit' when it is set to 1.
+
         quitStr holds the word 'quit' as the user types it. If the last letter is not valid
         the quitFlag is set to 0. If it is valid quitFlag is set to 1
      */
@@ -55,6 +57,7 @@ class EchoThread implements Runnable
     {
         try
         {
+            //connect to input and output streams from socket object
             fromClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
             toClient =new PrintWriter(client.getOutputStream());
         }
@@ -64,26 +67,26 @@ class EchoThread implements Runnable
         }
         try
         {
+            //this loop terminates when readInt == -1 or the user types 'quit'
             while(readInt != -1){
                 readInt = fromClient.read();
 
-                //convert to char, then string with compliant characters (letters only)
+                //take in char from outputStream and convert it to a String
                 char charFromClient = (char)readInt;
                 String stringFromClient = String.valueOf(charFromClient);
                 stringFromClient = stringFromClient.replaceAll("[\\d\\W]", "");
-                //if it's a null string go to next iteration of loop
+                //if it's an empty string go to next iteration of loop
                 if(stringFromClient.equals("")){
                     continue;
                 }
 
-                //print char
+                //print char on console and back to the client
                 System.out.println(stringFromClient);
                 toClient.println(stringFromClient);
 
                 //this checks if the user is writing "quit" or "QUIT"
                 if(quitFlag == 1 || stringFromClient.equalsIgnoreCase("q")){
-                    //guarantees that the the quit flag is on
-                    quitFlag = 1;
+                    quitFlag = 1;   //guarantees that the the quit flag is on
                     quitStr += stringFromClient;
 
                     //see if the user is typing valid letters & order for 'quit'
@@ -91,7 +94,7 @@ class EchoThread implements Runnable
                     if(checkQuit(quitStr)){
                         //see if the entire word has been typed
                         if(quitStr.equals("quit")){
-                            //close connection
+                            //close connection because user typed 'quit'
                             break;
                         }
                     }
@@ -112,6 +115,7 @@ class EchoThread implements Runnable
         {
             try
             {
+                //close socket, input stream, and output stream.
                 System.out.println("Connection Closing..");
                 if (fromClient!=null)
                 {
