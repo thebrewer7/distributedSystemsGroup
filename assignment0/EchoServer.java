@@ -64,39 +64,27 @@ class EchoThread implements Runnable
         }
         try
         {
-//            line = fromClient.readLine();
-//            //Check for client to say "quit"
-//            while(line.compareToIgnoreCase("QUIT") != 0)
-//            {
-//                line = fromClient.readLine();
-//                //use a regex to remove all nonletters when echoing back to the client
-//                line = line.replaceAll("[\\W\\d]", "");
-//                toClient.println(line);
-//                toClient.flush();
-//                System.out.println("Response to Client  :  " + line);
-//            }
-
             while(readInt != -1){
                 readInt = fromClient.read();
 
                 //convert to char, then string with compliant characters (letters only)
-                char character = (char)readInt;
-                String charStr = String.valueOf(character);
-                charStr = charStr.replaceAll("[\\d\\W]", "");
+                char charFromClient = (char)readInt;
+                String stringFromClient = String.valueOf(charFromClient);
+                stringFromClient = stringFromClient.replaceAll("[\\d\\W]", "");
                 //if it's a null string go to next iteration of loop
-                if(charStr.equals("")){
+                if(stringFromClient.equals("")){
                     continue;
                 }
 
                 //print char
-                System.out.println(charStr);
-                toClient.println(charStr);
+                System.out.println(stringFromClient);
+                toClient.println(stringFromClient);
 
                 //this checks if the user is writing "quit" or "QUIT"
-                if(quitFlag == 1 || charStr.equalsIgnoreCase("q")){
+                if(quitFlag == 1 || stringFromClient.equalsIgnoreCase("q")){
                     //guarantees that the the quit flag is on
                     quitFlag = 1;
-                    quitStr += charStr;
+                    quitStr += stringFromClient;
 
                     //see if the user is typing valid letters & order for 'quit'
                     quitStr = quitStr.toLowerCase();
