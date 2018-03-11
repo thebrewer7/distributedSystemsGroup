@@ -1,19 +1,14 @@
-
-package transactionalserver.account;
-
-import java.util.UUID;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package accountmanager;
 
 /**
- *  Represents a bank account. Accounts can have negative balances.
- * 
- *  It is handled by the AccountManager class
+ *
+ * @author Kelli
  */
 public class Account {
-
-    /**
-     * Constructor
-     */
-    public Account(){
-      
-    }
+    
 }
