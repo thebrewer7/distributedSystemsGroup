@@ -11,10 +11,6 @@ package transactionalserver.account;
  */
 package accountmanager;
 
-/**
- *
- * @author Kelli
- */
 public class AccountManager {
     
     private ArrayList<Account> accounts;
