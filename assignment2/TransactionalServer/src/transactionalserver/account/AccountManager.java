@@ -1,5 +1,7 @@
 package transactionalserver.account;
 
+import java.util.ArrayList;
+
 /**
  *  Handles the accounts and initializing them.
  * 
@@ -9,8 +11,6 @@ package transactionalserver.account;
  * 
  *  This class will call the LockManager to acquire locks for reads & writes
  */
-package accountmanager;
-
 public class AccountManager {
     
     private ArrayList<Account> accounts;

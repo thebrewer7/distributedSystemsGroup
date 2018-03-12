@@ -7,7 +7,7 @@ package transactionalserver.client;
  *  The client side will be specifying actions to occur with bank accounts
  */
 public class TransactionClient {
-    private Bool hasALock;
+    private boolean hasALock;
     private int value;
 
     /**
@@ -21,9 +21,9 @@ public class TransactionClient {
 
     /**
     * returns true is the client currently has a lock
-    * returns false if the client doesnt have a lock
+    * returns false if the client doesn't have a lock
     */
-    public Bool hasLock(){
+    public boolean hasLock(){
       if(hasALock == true){
         return true;
       }

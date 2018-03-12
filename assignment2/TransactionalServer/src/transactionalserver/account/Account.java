@@ -8,22 +8,25 @@ import java.util.UUID;
  *  It is handled by the AccountManager class
  */
 
-private int balance;
-private int accountID;
+public class Account{
+    private int balance;
+    private int accountID;
 
-public class Account(int balance,int accountID) {
-    this.balance = balance;
-    this.accountID = accountID;   
-}
+    public Account(int balance,int accountID) {
+        this.balance = balance;
+        this.accountID = accountID;   
+    }
 
-public int getAccountID(){
-    return accountID;
-}
+    public int getAccountID(){
+        return accountID;
+    }
 
-public int increaseBalance(int amount){
-balance += amount;
-}
+    public void increaseBalance(int amount){
+        balance += amount;
+    }
 
-public int getBalance(){
-    return balance;
+    public int getBalance(){
+        return balance;
+    }
+
 }

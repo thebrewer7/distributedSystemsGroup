@@ -1,5 +1,7 @@
 package transactionalserver.lock;
 
+import transactionalserver.account.Account;
+        
 /**
  *  The LockManager handles and initializes all of the Lock objects
  * 
