@@ -5,11 +5,36 @@ package transactionalserver.lock;
  * object cannot be accessed
  */
 public class Lock {
-    
+
     /**
      *  Constructor
      */
     public Lock(){
 
     }
+
+    /**
+    * checks the client list to see if a lock is there or not
+    * if there is a lock then it is cannot open one
+    */
+    public Bool acquire(TransactionClient client){
+      //TODO: check if there is a lock existing
+      /* if(transactionList.hasLock == false){
+        client.hasLock = true;
+      }
+      else{
+        System.out.println("Lock already exists, wait.");
+      }
+
+    }
+
+    /**
+    * this will only be called if there is an existing lock
+    * if there is a lock then the lock will be removed
+    */
+    public Bool release(TransactionClient client){
+      client.hasLock = false;
+      return false;
+    }
+
 }
