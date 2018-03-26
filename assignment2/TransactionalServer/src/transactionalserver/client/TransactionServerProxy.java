@@ -9,7 +9,7 @@ package transactionalserver.client;
  *  high-level API calls to low-level network messages
  */
 public class TransactionServerProxy {
-    private TransactionClient client = client;
+    private TransactionClient client;
     private int looseMoney;
 
     /**

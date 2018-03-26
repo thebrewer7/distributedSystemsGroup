@@ -18,9 +18,14 @@ public class AccountManager {
  /**
      * Constructor
      */
-    public AccountManager(){
+    public AccountManager(int numAccounts, int initialBalance){
         //create a new account
         accounts = new ArrayList <Account>();
+        
+        //initialize all of the accounts with the initial balance given
+        for(int i=0; i<numAccounts; i++){
+            accounts.add(new Account(initialBalance, i));
+        }
         
     }
     /*
@@ -29,7 +34,7 @@ public class AccountManager {
     */
     public int getBalance(int transactionID, int accountID){
         //balance is the specific account ID's balance
-        int balance = account.getBalance();
+        int balance = accounts.get(accountID).getBalance();
         
         //call lock manager for READ and set a lock giving the current account id, transaction id
         
@@ -45,7 +50,8 @@ public class AccountManager {
         
         //call lock manager for WRITE and set a lock giving the current account id, transaction id
         
-        return balance;
+//        return balance;
+        return 0;
     }
     
 }

@@ -39,15 +39,15 @@ public class LockManager {
      * @param transactionID
      */
     public boolean checkConflict(Account account, int transactionID){
-        if( "read".equals(lockType)){
-            //wait for a commit or abort
-            return false;
-        }
-        
-        if("write".equals(lockType)){
-            //wait for commit or abort
-            return false;
-        }
+//        if( "read".equals(lockType)){
+//            //wait for a commit or abort
+//            return false;
+//        }
+//        
+//        if("write".equals(lockType)){
+//            //wait for commit or abort
+//            return false;
+//        }
         return true; 
     }
 }

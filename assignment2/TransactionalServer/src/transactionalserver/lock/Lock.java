@@ -21,13 +21,14 @@ public class Lock {
     */
     public boolean acquire(TransactionClient client){
       //TODO: check if there is a lock existing
-       if(transactionList.hasLock == false){
-        client.hasLock = true;
-      }
-      else{
-        System.out.println("Lock already exists, wait.");
-      }
+//       if(transactionList.hasLock == false){
+//        client.hasLock = true;
+//      }
+//      else{
+//        System.out.println("Lock already exists, wait.");
+//      }
 
+       return false;
     }
 
     /**
@@ -35,7 +36,7 @@ public class Lock {
     * if there is a lock then the lock will be removed
     */
     public boolean release(TransactionClient client){
-      client.hasLock = false;
+//      client.hasLock = false;s
       return false;
     }
 

@@ -1,18 +1,17 @@
 package transactionalserver.transaction;
 
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  *  Represents a transaction
  */
 public class Transaction {
-    private UUID id;
+    private int id;
     /**
      * Constructor
      */
-    public Transaction(){
-        id = UUID.randomUUID();
+    public Transaction(int id){
+        this.id = id;
     }
     
     //----------- Transaction Methods
@@ -23,6 +22,8 @@ public class Transaction {
      */
     public void read(){
         //TODO: get read lock
+        
+                
         //TODO: read from account
     }
     
@@ -48,7 +49,7 @@ public class Transaction {
      * returns it's ID
      * @return the Transaction's ID which is a UUID object
      */
-    public UUID getID(){
+    public int getID(){
         return id;
     }
     

@@ -11,27 +11,32 @@ public class TransactionManager {
     
     /**
      * Constructor
+     * 
+     * @param numTransactions   the number of transactions the manager needs to
+     *                          keep track of & initialize
      */
-    public TransactionManager(){
+    public TransactionManager(int numTransactions){
+        // initialize the arraylist
         transactionList = new ArrayList<Transaction>();
+        
+        // initialize each transactions
+        for(int i=0; i<numTransactions; i++){
+            transactionList.add(new Transaction(i));
+        }
     }
     
     /**
-     * Opens a transaction object
+     * Closes a transaction object
+     * 
+     * @param transactionID the ID of the transaction
      */
-    public void openTransaction(){
-        //add new transaction to the transaction list
-        transactionList.add(new Transaction());
-    }
-    
-    /**
-     * Closes a transaction2 object
-     */
-    public void closeTransaction(UUID transactionID){
+    public void closeTransaction(int transactionID){
         // look for Transaction object in the Transaction list & remove it
         for(int i=0; i<transactionList.size(); i++){
-            Transaction currTransaction = transactionList.get(i);            
-            if(currTransaction.getID().equals(transactionID)){
+            Transaction currTransaction = transactionList.get(i);  
+            
+            // check if it's the transactions it's looking for
+            if(currTransaction.getID() == transactionID){
                 //close transaction so it will release its locks
                 currTransaction.close();
                 //remove from list because it's closed
