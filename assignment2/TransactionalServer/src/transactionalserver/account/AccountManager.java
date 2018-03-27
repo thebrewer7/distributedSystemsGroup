@@ -1,6 +1,10 @@
 package transactionalserver.account;
 
 import java.util.ArrayList;
+import transactionalserver.client.TransactionClient;
+import transactionalserver.lock.LockManager;
+import transactionalserver.lock.LockType;
+import transactionalserver.transaction.Transaction;
 
 /**
  *  Handles the accounts and initializing them.
@@ -12,17 +16,22 @@ import java.util.ArrayList;
  *  This class will call the LockManager to acquire locks for reads & writes
  */
 public class AccountManager {
-    
+    private LockManager lockManager;
     private ArrayList<Account> accounts;
     int numberAccounts;
     int initialBalance;
     /*
       Constructor
      */
-    public AccountManager(int numberAccounts, int initialBalance){
-        //create a new account
+    public AccountManager(int numberAccounts, int initialBalance, 
+            LockManager lockMaanger){
+        //create all of the accounts
         accounts = new ArrayList();
-        
+       for(int i=0; i<numberAccounts; i++){
+           accounts.add(new Account(initialBalance));
+       }
+       
+       this.lockManager = lockManager;
     }
     
     /*
@@ -32,12 +41,16 @@ public class AccountManager {
         return accounts;
     }
      
+     public Account getAccount(int accountID){
+         return accounts.get(accountID);
+     }
+     
      /*
      Read action for an account
      */
      
-    public int read(Account account, TransactionClinet transaction){
-        (transactionServer.lockManager).lock(account,transaction, READLOCK);
+    public int read(Account account, Transaction transaction){
+        lockManager.lock(transaction, account, LockType.READ);
                 return account.getBalance();
     }
     
@@ -45,7 +58,7 @@ public class AccountManager {
     Write action for an account
     */
     public int write(Account account, Transaction transaction,int balance){
-        (transactionServer.lockManager).lock(account,transaction, WRITELOCK);
+        lockManager.lock(transaction, account, LockType.WRITE);
         account.setBalance(balance);
         return balance;     
     }  

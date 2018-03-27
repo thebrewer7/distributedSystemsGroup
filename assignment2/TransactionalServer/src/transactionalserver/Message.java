@@ -8,7 +8,14 @@ public class Message {
     private MessageType messageType;
     private int accountNumber;
     private int amount;
-
+    
+    /**
+     * Constructor for open and close transaction requests
+     */
+    public Message(MessageType messageType){
+        this.messageType = messageType;
+    }
+    
     /**
      *  Constructor for read request
      */

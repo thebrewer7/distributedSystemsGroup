@@ -10,18 +10,28 @@ import transactionalserver.account.AccountManager;
 import transactionalserver.lock.LockManager;
 import transactionalserver.transaction.TransactionManager;
 
+
 /**
  * This is the server that handles transactions from its clients
  */
 public class TransactionalServer implements Runnable{
-    private AccountManager accountManager;
-    private TransactionManager transactionManager;
-    private LockManager lockManager;
+    private static AccountManager accountManager;
+    private static TransactionManager transactionManager;
+    private static LockManager lockManager;
     private boolean isRunning = true;
     
-    public TransactionalServer(){
-        accountManager = new AccountManager(100, 100);
-        transactionManager = new TransactionManager();
+    public TransactionalServer(String propertiesFilePath){
+        // get configurations from properties file
+        Properties props = new Properties();
+        try{
+            props.load(new FileInputStream(propertiesFilePath));
+        } catch(IOException e){
+            System.out.println(e);
+        }
+        
+        accountManager = new AccountManager(100, 100, lockManager);
+        transactionManager = new TransactionManager(accountManager, 
+                lockManager);
         lockManager = new LockManager("filePath");
     }
     
@@ -47,7 +57,8 @@ public class TransactionalServer implements Runnable{
     }
     
     public static void main(String[] args){
-        TransactionalServer transServer = new TransactionalServer();
+        TransactionalServer transServer = new TransactionalServer("src/"
+                + "transactionalserver/server/clientproperties.properties");
         
     }
 }

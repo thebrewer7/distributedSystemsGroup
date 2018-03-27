@@ -9,6 +9,8 @@ import java.util.UUID;
 import transactionalserver.Message;
 import transactionalserver.MessageType;
 import transactionalserver.account.Account;
+import transactionalserver.account.AccountManager;
+import transactionalserver.lock.LockManager;
 
 /**
  * The TransactionManager handles all of the transactions
@@ -17,13 +19,19 @@ public class TransactionManager {
     private ArrayList<Transaction> transactionList;
     private int numTransactions = 0;
     
+    private static AccountManager accountManager;
+    private static LockManager lockManager;
+    
     /**
      * Constructor
      * 
      */
-    public TransactionManager(){
+    public TransactionManager(AccountManager accountManager, 
+            LockManager lockManager){
         // initialize the arraylist
         transactionList = new ArrayList<Transaction>();
+        this.accountManager = accountManager;
+        this.lockManager = lockManager;
     }
     
     /**
@@ -127,7 +135,7 @@ public class TransactionManager {
        
        private void closeTransaction(){
            // release all locks that the transaction ahs           
-           TransactionServer.lockManager.unlock(transaction);
+           lockManager.unLock(transaction);
            
            // remove transaction from transaction list
            for(int i=0; i<transactionList.size(); i++){
@@ -153,15 +161,14 @@ public class TransactionManager {
        private void readRequest(Message message){
            //get account to read from
            int accountID = ((int[]) message.getContent())[0];
-           account =  TransactionServer.accountManager.getAccount(accountID);
+           account =  accountManager.getAccount(accountID);
            
            /**
             * TODO:
             * transaction.log(TRANSactionmanagerworker.run READREQUEST FOR ACCOUNTNUMBER)
             */
            
-           currentBalance = TransactionServer.accountManager
-                   .read(currentAccount, transaction);
+           currentBalance = accountManager.read(account, transaction);
            
            try{
                toClient.writeObject(currentBalance);
@@ -181,7 +188,7 @@ public class TransactionManager {
             */
            int[] content = (int[]) message.getContent();
            int accountID = content[0];
-           account = TransactionServer.accountManager.getAccount(accountID);
+           account = accountManager.getAccount(accountID);
            currentBalance = content[1];
            
            try{
