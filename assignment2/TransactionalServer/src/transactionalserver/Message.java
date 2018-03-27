@@ -1,4 +1,4 @@
-package transactionalserver.message;
+package transactionalserver;
 
 /**
  * Represents a message that would check the request type
