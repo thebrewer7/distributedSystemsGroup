@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 import transactionalserver.account.AccountManager;
+import transactionalserver.lock.LockManager;
 import transactionalserver.transaction.TransactionManager;
 
 /**
@@ -15,11 +16,13 @@ import transactionalserver.transaction.TransactionManager;
 public class TransactionalServer implements Runnable{
     private AccountManager accountManager;
     private TransactionManager transactionManager;
+    private LockManager lockManager;
     private boolean isRunning = true;
     
     public TransactionalServer(){
         accountManager = new AccountManager(100, 100);
         transactionManager = new TransactionManager();
+        lockManager = new LockManager();
     }
     
     public void run(){

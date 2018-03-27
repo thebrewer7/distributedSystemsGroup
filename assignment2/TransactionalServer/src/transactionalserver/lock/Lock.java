@@ -1,5 +1,10 @@
 package transactionalserver.lock;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import transactionalserver.account.Account;
+import transactionalserver.transaction.Transaction;
+
 /**
  * Represents a lock for an Account object. If it's locked, then the Account
  * object cannot be accessed
