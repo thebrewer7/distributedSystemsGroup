@@ -41,9 +41,9 @@ public class TransactionClient {
             System.out.println("Transaction " + transID + " going from account " + accountMovingFrom +
             " to account " + accountMovingTo + ".");
             balance = transaction.read(accountMovingFrom);
-            transaction.write(accountMovingFrom, balance-amount);
+            transaction.write(accountMovingFrom, balance-amountToMove);
             balance = transaction.read(accountMovingTo);
-            transaction.write(accountMovingTo, balance+amount);
+            transaction.write(accountMovingTo, balance+amountToMove);
             transaction.closeTransaction()
             System.out.println("Transaction " + transID + " has finished.");
           }
