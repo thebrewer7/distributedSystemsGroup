@@ -9,34 +9,57 @@ package transactionalserver.client;
  *  high-level API calls to low-level network messages
  */
 public class TransactionServerProxy {
-    private TransactionClient client;
-    private int looseMoney;
 
     /**
      * Constructor
-     * created with a client and sets the amount of loose money to 0
-     * loose money is money that has been withdrawn but not inserted yet
+     * created with a host and port number
      */
-    public TransactionServerProxy(TransactionClient client){
-      this.client = client;
-      this.looseMoney = 0;
+    public TransactionServerProxy(String host, int port){
+      this.host = host;
+      this.port = port;
+    }
+
+    /**
+    * opens a transaction and creates a socket stream
+    * opens a transactionID from the input stream
+    */
+    public int openTransaction(){
+      Message openTransMessage = new Message("OPEN_TRANSACTION", null)
+      dbConnection = new Socket(host, port);
+      writeToNet = new ObjectOutputStream(dbConnection.getOutputStream());
+      readFromNet = new ObjectInputStream(dbConnection.getInputStream());
+      transID = (int) readFromNet.readObject();
+
+      return transID;
+    }
+
+    /**
+    * closes a transaction
+    */
+    public void closeTransaction(){
+      Message clonseTransMessage = new Message("CLOSE_TRANSACTION", null);
+      //TODO:
+    }
+
+    /**
+    * reads the balance for a given account number and return that balance
+    */
+    public int read(int accountNumber){
+      Message readMessage = new Message("READ_REQUEST", new int(accountNumber));
+      int balance = null;
+      writeToNet.writeObject(readMessage);
+      balance = (int) readFromNet.readObject();
+
+      return balance;
     }
 
     /**
     * translates the clients withdraw into what is happening with it
     * behind the scenes
     */
-    public void withdraw(int withdrawAmount){
-      looseMoney += withdrawAmount;
-      client.withdraw(withdrawAmount);
-    }
-
-    /**
-    * translates the clients insert into what is happening with it 
-    * behind the scenes
-    */
-    public void insert(int insertAmount){
-      looseMoney -= insertAmount;
-      client.insert(insertAmount);
+    public void write(int accountNumber, int amount){
+      Object[] content = new Object[]{accountNumber, amount};
+      Message writeMessage = new Message("WRITE_REQUEST", new int(accountNumber));
+      //TODO:
     }
 }
