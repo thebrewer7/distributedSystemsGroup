@@ -1,4 +1,7 @@
 package transactionalserver.lock;
+import java.util.HashMap;
+import java.util.Iterator;
+
 
 import transactionalserver.account.Account;
         
@@ -8,46 +11,29 @@ import transactionalserver.account.Account;
  *  It will acquire and release locks for the AccountManager.
  *  Unlocking will be done in the TransactionsMaangerWorker.
  */
-public class LockManager {
+public class LockManager{
     
     //Some kind of data structure to hold locks info
-    
+    private HashMap<Account, Lock> locks;
+
     public LockManager(){
         //initialize structure holding locks
-        
+        locks = new HashMap<>();   
     }
     
-    /**
-     * Set Locks
-     * @param account being acted on and specific transactionID 
-     */
-    public void setLock(Account account, int transactionID){
-        
+    /*
+    Sets a lock on a transaction
+    */
+    void lock(Transaction transaction){
+        Iterator<Lock> lockIterator = transaction.getLocks().listIterator();
+        Lock currentLock = currentLock.acquire(transaction);
     }
     
-    public void unlock(Account account, int transactionID){
-        
-    }
-    
-    /**
-     * Check for conflict before setting locks
-     * 1. Read already performed... do not allow anyone else to write 
-     *      until commit or abort
-     * 2. Write already performed... do not allow anyone else to 
-     *      read OR write until commit or abort
-     * @param account 
-     * @param transactionID
-     */
-    public boolean checkConflict(Account account, int transactionID){
-//        if( "read".equals(lockType)){
-//            //wait for a commit or abort
-//            return false;
-//        }
-//        
-//        if("write".equals(lockType)){
-//            //wait for commit or abort
-//            return false;
-//        }
-        return true; 
+    /* 
+    Unlocks a lock on a transaction
+    */
+    void unLock(Transaction transaction){
+        Iterator<Lock> lockIterator = transaction.getLocks().listIterator();
+        Lock currentLock = currentLock.realease(transaction);
     }
 }
