@@ -1,7 +1,9 @@
 package transactionalserver.transaction;
 
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.UUID;
+import transactionalserver.server.TransactionManagerThread;
 
 /**
  * The TransactionManager handles all of the transactions
@@ -12,37 +14,22 @@ public class TransactionManager {
     /**
      * Constructor
      * 
-     * @param numTransactions   the number of transactions the manager needs to
-     *                          keep track of & initialize
      */
-    public TransactionManager(int numTransactions){
+    public TransactionManager(){
         // initialize the arraylist
         transactionList = new ArrayList<Transaction>();
-        
-        // initialize each transactions
-        for(int i=0; i<numTransactions; i++){
-            transactionList.add(new Transaction(i));
-        }
     }
     
     /**
-     * Closes a transaction object
+     * Returns the list of transactions 
      * 
-     * @param transactionID the ID of the transaction
+     * @return the list of transactions
      */
-    public void closeTransaction(int transactionID){
-        // look for Transaction object in the Transaction list & remove it
-        for(int i=0; i<transactionList.size(); i++){
-            Transaction currTransaction = transactionList.get(i);  
-            
-            // check if it's the transactions it's looking for
-            if(currTransaction.getID() == transactionID){
-                //close transaction so it will release its locks
-                currTransaction.close();
-                //remove from list because it's closed
-                transactionList.remove(i);
-                break;
-            }
-        }
+    public ArrayList<Transaction> getTransactions(){
+        return transactionList;
+    }
+    
+    public void runTransactions(Socket client){
+        (new TransactionManagerThread(client)).run();
     }
 }

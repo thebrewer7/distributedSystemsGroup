@@ -1,12 +1,18 @@
 package transactionalserver.transaction;
 
+import java.util.ArrayList;
 import java.util.Objects;
+import transactionalserver.lock.Lock;
 
 /**
  *  Represents a transaction
  */
 public class Transaction {
+    // private variables
     private int id;
+    private ArrayList<Lock> locksList = null;
+    
+    
     /**
      * Constructor
      */
@@ -15,33 +21,27 @@ public class Transaction {
     }
     
     //----------- Transaction Methods
-       
+    
     /**
-     * Reads an object which requires getting a lock for the object to read 
-     * from
+     * This is a lock that the Transaction has so that other transactions cannot
+     * write/read on the object the lock belongs to
+     * 
+     * @param lock the lock to add to the list of locks the transaction has
      */
-    public void read(){
-        //TODO: get read lock
-        
-                
-        //TODO: read from account
+    public void addLock(Lock lock){
+        locksList.add(lock);
     }
     
     /**
-     * Writes to an object which requires getting a lock for the object to 
-     * write on
+     * This is a lock that the Transaction is releasing so that other 
+     * transactions can use it.
+     * 
+     * @param lock the lock to remove from the list of locks
      */
-    public void write(){
-        //TODO: get write lock
-        //TODO: write to account
+    public void removeLock(Lock lock){
+        locksList.remove(lock);
     }
     
-    /**
-     * Closes the transactions and releases all the locks it has
-     */
-    public void close(){
-        //TODO: release keys
-    }
     
     //----------- getters
     
@@ -51,6 +51,15 @@ public class Transaction {
      */
     public int getID(){
         return id;
+    }
+    
+    /**
+     * returns the locks the Transactions has
+     * 
+     * @return the list of locks the Transaction has
+     */
+    public ArrayList<Lock> getLocks(){
+        return locksList;
     }
     
     //------------- Overiding Object Methods

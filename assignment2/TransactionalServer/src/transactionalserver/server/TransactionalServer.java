@@ -12,56 +12,17 @@ import transactionalserver.transaction.TransactionManager;
 /**
  * This is the server that handles transactions from its clients
  */
-public class TransactionalServer {
+public class TransactionalServer implements Runnable{
     private AccountManager accountManager;
     private TransactionManager transactionManager;
+    private boolean isRunning = true;
     
     public TransactionalServer(){
-        // ---------- Get Configurations
-        
-        /**
-         * Get config file to know how many transactions & how many bank 
-         * accounts to have & what the initial balance of all the bank accounts
-         */
-        Properties prop = new Properties();
-        InputStream input = null;
-        
-        // initialize variables for need info from config file
-        int numTransactions = 0;
-        int initialBalance = 0;
-        int numAccounts = 0;
-        
-        try{
-            //load properites file
-            input = new FileInputStream("src/transactionalserver/server/config"
-                    + ".properties");
-            prop.load(input);
-            
-            // get the number of transactions and accounts
-            numTransactions = Integer.valueOf(prop
-                    .getProperty("numTransactions"));
-            numAccounts = Integer.valueOf(prop.getProperty("numAccounts"));
-            initialBalance = Integer.valueOf(prop
-                    .getProperty("initialBalance"));
-            
-            //close input stream
-            input.close();
-            
-        } catch(IOException e){
-            System.out.println(e);
-        }
-        
-        // ---------- Initialize Accounts & Transactions
-        // initialize accounts
-        accountManager = new AccountManager(numAccounts, initialBalance);
-        
-        //initialize transactions
-        transactionManager = new TransactionManager(numTransactions);
-        
+        accountManager = new AccountManager(100, 100);
+        transactionManager = new TransactionManager();
     }
     
-    public static void main(String[] args){
-        TransactionalServer transServer = new TransactionalServer();
+    public void run(){
         try{
             ServerSocket serverSocket = new ServerSocket(9090);
         
@@ -75,11 +36,15 @@ public class TransactionalServer {
                 System.out.println("Connected to a new client\n\n");
                 
                 //send client to a thread to communicate with server
-                new Thread(new TransactionManagerThread(client)).start();
+                transactionManager.runTransactions(client);
             }
         }catch(IOException e){
             System.out.println(e);
         }
+    }
+    
+    public static void main(String[] args){
+        TransactionalServer transServer = new TransactionalServer();
         
     }
 }
