@@ -16,13 +16,12 @@ public class AccountManager {
     private ArrayList<Account> accounts;
     int numberAccounts;
     int initialBalance;
- /**
-     * Constructor
+    /*
+     Constructor
      */
     public AccountManager(int numberAccounts, int initialBalance){
         //create a new account
         accounts = new ArrayList();
-        
     }
     
     /*
@@ -48,6 +47,5 @@ public class AccountManager {
         (transactionServer.lockManager).lock(account,transaction, WRITELOCK);
         account.setBalance(balance);
         return balance;     
-    }
-    
+    } 
 }
