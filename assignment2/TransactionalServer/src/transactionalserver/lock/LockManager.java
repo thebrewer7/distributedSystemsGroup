@@ -2,7 +2,6 @@ package transactionalserver.lock;
 import java.util.HashMap;
 import java.util.Iterator;
 
-
 import transactionalserver.account.Account;
         
 /**
@@ -20,19 +19,23 @@ public class LockManager{
         //initialize structure holding locks
         locks = new HashMap<>();   
     }
-    
     /*
     Sets a lock on a transaction
     */
-    void lock(Transaction transaction){
+    void lock(Transaction transaction, LockType lockType){
+        if (!applyLocking){
+            return;
+        }
         Iterator<Lock> lockIterator = transaction.getLocks().listIterator();
         Lock currentLock = currentLock.acquire(transaction);
     }
-    
     /* 
     Unlocks a lock on a transaction
     */
     void unLock(Transaction transaction){
+        if (!applyLocking){
+            return;
+        }
         Iterator<Lock> lockIterator = transaction.getLocks().listIterator();
         Lock currentLock = currentLock.realease(transaction);
     }
