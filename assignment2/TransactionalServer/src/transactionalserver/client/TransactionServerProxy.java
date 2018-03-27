@@ -59,7 +59,7 @@ public class TransactionServerProxy {
     */
     public void write(int accountNumber, int amount){
       Object[] content = new Object[]{accountNumber, amount};
-      Message writeMessage = new Message("WRITE_REQUEST", new int(accountNumber));
+      Message writeMessage = new Message("WRITE_REQUEST", new int(accountNumber), amount);
       int balance += amount;
       writeToNet.writeObject(writeMessage);
       balance += (int) readFromNet.readObject();
