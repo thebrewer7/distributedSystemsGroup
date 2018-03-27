@@ -15,14 +15,16 @@ public class LockManager{
     //Some kind of data structure to hold locks info
     private HashMap<Account, Lock> locks;
 
-    public LockManager(){
+    public LockManager(String clientProperties){
+        properties clientProperties = new propertyhandler(clientProperties);
+        applyLocking = clientProperties.getProperty(applyLocking);
         //initialize structure holding locks
         locks = new HashMap<>();   
     }
     /*
     Sets a lock on a transaction
     */
-    void lock(Transaction transaction, LockType lockType){
+    void lock(Transaction transaction, LockType lockType, applyLocking){
         if (!applyLocking){
             return;
         }
@@ -32,11 +34,10 @@ public class LockManager{
     /* 
     Unlocks a lock on a transaction
     */
-    void unLock(Transaction transaction){
+    void unLock(Transaction transaction, applyLocking){
         if (!applyLocking){
             return;
         }
         Iterator<Lock> lockIterator = transaction.getLocks().listIterator();
         Lock currentLock = currentLock.realease(transaction);
     }
-}
