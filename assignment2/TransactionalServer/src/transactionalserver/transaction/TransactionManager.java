@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.UUID;
+import transactionalserver.Message;
 import transactionalserver.MessageType;
 import transactionalserver.account.Account;
 
@@ -68,9 +69,9 @@ public class TransactionManager {
                boolean isRunning = true;
                while(isRunning){
                    try{
-                       Message message = fromClient.readObject();
+                       Message message = (Message) fromClient.readObject();
                        
-                       switch((MessageType) message.getType()){
+                       switch(message.getType()){
                            case OPEN_TRANSACTION:
                                openTransaction();
                                break;

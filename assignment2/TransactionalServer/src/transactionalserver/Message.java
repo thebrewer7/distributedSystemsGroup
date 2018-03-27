@@ -5,14 +5,14 @@ package transactionalserver;
  * and also the account number
  */
 public class Message {
-    private String messageType;
+    private MessageType messageType;
     private int accountNumber;
     private int amount;
 
     /**
      *  Constructor for read request
      */
-    public Message(String messageType, int accountNumber){
+    public Message(MessageType messageType, int accountNumber){
       this.messageType = messageType;
       this.accountNumber = accountNumber;
     }
@@ -20,7 +20,7 @@ public class Message {
     /**
      *  Constructor for write request
      */
-    public Message(String messageType, int accountNumber, int amount){
+    public Message(MessageType messageType, int accountNumber, int amount){
       this.messageType = messageType;
       this.accountNumber = accountNumber;
       this.amount = amount;
@@ -30,7 +30,7 @@ public class Message {
     /**
      * returns the type of the message
      */
-    public String getType(String messageType){
+    public MessageType getType(){
       return messageType;
     }
 
@@ -39,17 +39,19 @@ public class Message {
      * returns the amount and account number for a write request
      */
     public int[] getContent(){
-      contentArray[] = [null, null];
-      if(messageType == "READ_REQUEST"){
+      int[] contentArray = new int[2];
+      if(messageType == MessageType.READ_REQUEST){
           contentArray[0] = accountNumber;
       }
-      else if(messageType == "WRITE_REQUEST"){
+      else if(messageType == MessageType.WRITE_REQUEST){
           contentArray[0] = accountNumber;
           contentArray[1] = amount;
       }
       else{
            contentArray[0] = accountNumber;
       }
+      
+      return contentArray;
     }
     
     

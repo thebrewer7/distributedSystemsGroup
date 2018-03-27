@@ -22,7 +22,7 @@ public class TransactionalServer implements Runnable{
     public TransactionalServer(){
         accountManager = new AccountManager(100, 100);
         transactionManager = new TransactionManager();
-        lockManager = new LockManager();
+        lockManager = new LockManager("filePath");
     }
     
     public void run(){
