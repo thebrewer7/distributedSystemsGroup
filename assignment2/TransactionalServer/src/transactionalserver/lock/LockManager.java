@@ -39,5 +39,8 @@ public class LockManager{
             return;
         }
         Iterator<Lock> lockIterator = transaction.getLocks().listIterator();
-        Lock currentLock = currentLock.realease(transaction);
+        while (lockIterator.hasNext()){
+            Lock currentLock = transaction.getLocks().next();
+            currentLock.realease(transaction);
+        }
     }
