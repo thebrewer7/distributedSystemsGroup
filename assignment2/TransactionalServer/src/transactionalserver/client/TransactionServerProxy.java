@@ -37,7 +37,7 @@ public class TransactionServerProxy {
     * closes a transaction
     */
     public void closeTransaction(){
-      Message clonseTransMessage = new Message("CLOSE_TRANSACTION", null);
+      Message closeTransMessage = new Message("CLOSE_TRANSACTION", null);
       //TODO:
     }
 
