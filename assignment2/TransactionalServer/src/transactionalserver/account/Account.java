@@ -9,24 +9,17 @@ import java.util.UUID;
  */
 
 public class Account{
-    private int balance;
-    private int accountID;
+    int balance;
 
-    public Account(int balance,int accountID) {
+    public Account(int balance) {
         this.balance = balance;
-        this.accountID = accountID;   
     }
-
-    public int getAccountID(){
-        return accountID;
+  
+    public void setBalance(int amount){
+        balance+= amount;   
     }
-
-    public void increaseBalance(int amount){
-        balance += amount;
-    }
-
+    
     public int getBalance(){
         return balance;
     }
-
 }
