@@ -14,44 +14,40 @@ import java.util.ArrayList;
 public class AccountManager {
     
     private ArrayList<Account> accounts;
-
+    int numberAccounts;
+    int initialBalance;
  /**
      * Constructor
      */
-    public AccountManager(int numAccounts, int initialBalance){
+    public AccountManager(int numberAccounts, int initialBalance){
         //create a new account
-        accounts = new ArrayList <Account>();
+        accounts = new ArrayList();
         
-        //initialize all of the accounts with the initial balance given
-        for(int i=0; i<numAccounts; i++){
-            accounts.add(new Account(initialBalance, i));
-        }
-        
-    }
-    /*
-    get the account balance of accounts
-    @param account id and transaction id
-    */
-    public int getBalance(int transactionID, int accountID){
-        //balance is the specific account ID's balance
-        int balance = accounts.get(accountID).getBalance();
-        
-        //call lock manager for READ and set a lock giving the current account id, transaction id
-        
-        return balance;
     }
     
     /*
-    set the account balance
-    @param account id, transaction id, amount being added to balance
+    Returns all accounts
     */
-    public int setBalance(){
-        //add the tranfer amount to the current balance
-        
-        //call lock manager for WRITE and set a lock giving the current account id, transaction id
-        
-//        return balance;
-        return 0;
+     public ArrayList<Account> getAccounts(){
+        return accounts;
+    }
+     
+     /*
+     Read action for an account
+     */
+     
+    public int read(Account account, TransactionClinet transaction){
+        (transactionServer.lockManager).lock(account,transaction, READLOCK);
+                return account.getBalance();
+    }
+    
+    /*
+    Write action for an account
+    */
+    public int write(Account account, Transaction transaction,int balance){
+        (transactionServer.lockManager).lock(account,transaction, WRITELOCK);
+        account.setBalance(balance);
+        return balance;     
     }
     
 }
