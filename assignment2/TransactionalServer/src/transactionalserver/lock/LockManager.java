@@ -24,7 +24,7 @@ public class LockManager{
     /*
     Sets a lock on a transaction
     */
-    void lock(Transaction transaction, LockType lockType, applyLocking){
+    void lock(Transaction transaction, LockType lockType){
         if (!applyLocking){
             return;
         }
@@ -34,7 +34,7 @@ public class LockManager{
     /* 
     Unlocks a lock on a transaction
     */
-    void unLock(Transaction transaction, applyLocking){
+    void unLock(Transaction transaction){
         if (!applyLocking){
             return;
         }
