@@ -59,6 +59,7 @@ public class TransactionalServer implements Runnable{
     public static void main(String[] args){
         TransactionalServer transServer = new TransactionalServer("src/"
                 + "transactionalserver/server/clientproperties.properties");
+        transServer.run();
         
     }
 }

@@ -16,7 +16,8 @@ public class Lock {
     Account account;
     LockType currentLockType;
     ArrayList<Transaction> lockHolders;
-    HashMap<Transaction, Object[]> lockRequestors;
+    HashMap<Transaction, Object[]> lockRequestors;  //transactions requesting a 
+                                                    //this lock
 
     /**
      *  Constructor
@@ -69,26 +70,45 @@ public class Lock {
       if(!lockHolders.isEmpty()){
         currentLockType = LockType.EMPTY_LOCK;
         if(lockRequestors.isEmpty()){
-          //TODO:
+          currentLockType = LockType.EMPTY_LOCK;
         }
       }
       notifyAll();
     }
 
     /**
-    * checks if there are lock holders, if there are,
-    * set lock type to be an empty lock and free
+    *   Checks if the transaction trying to acquire the specific lock type is 
+    *   conflict free
     */
     public Boolean isConflict(Transaction transaction, LockType newLockType){
       if(lockHolders.isEmpty()){
-        //transaction.log("Is conflict on current lock");
         return false;
       }
-      else if(lockHolders.size() == 1 && lockHolders.contains(transaction)){
-        //TODO:
-        return true;
+      else if(currentLockType == LockType.READ && newLockType == 
+              LockType.READ){
+          return false;
       }
-      
-      return false;
+      // if the transactions wants to promote the lock and it's the only hodler
+      else if(currentLockType == LockType.READ && newLockType == 
+              LockType.WRITE && lockHolders.size() == 1  && lockHolders
+              .contains(transaction)){
+          return true;
+      }
+      /**
+       * All other cases are conflicts:
+       *    * currentLockType  == READ && newLockType == WRITE 
+       *        & lockHolder size is greater than 1
+       *    * currentLockType == WRITE (can't demote & can't share write locks)
+       */
+      else{
+          return false;
+      }
+      /**
+       * TODO: check other cases for conflicts
+       * 
+       * if lockType == write, it's a conflict
+       * if newLockType == write, it's a conflict
+       * if lockType ==  read && newLockType == read, no conflict
+       */
     }
 }

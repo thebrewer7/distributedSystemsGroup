@@ -18,7 +18,6 @@ import transactionalserver.MessageType;
  *  high-level API calls to low-level network messages
  */
 public class TransactionServerProxy {
-    private Socket server;
     private ObjectInputStream fromServer;
     private ObjectOutputStream toServer;
 
@@ -49,10 +48,9 @@ public class TransactionServerProxy {
     }
 
     /**
-    * opens a transaction and creates a socket stream
-    * opens a transactionID from the input stream
+    * opens a transaction and gets a transactionID from the input stream
     */
-    public int openTransaction(){
+        public int openTransaction(){
       Message openTransMessage = new Message(MessageType.OPEN_TRANSACTION);
       
       // connect to server
@@ -63,12 +61,10 @@ public class TransactionServerProxy {
           
           // get Transaction ID
           transID = (int) fromServer.readObject();
-      } catch(IOException e){
-          System.out.println(e);
-      } catch(ClassNotFoundException e){
+      } catch(IOException | ClassNotFoundException e){
           System.out.println(e);
       }
-
+      
       return transID;
     }
 
@@ -91,7 +87,7 @@ public class TransactionServerProxy {
     /**
     * reads the balance for a given account number and return that balance
     */
-    public int read(int accountNumber) throws Exception{
+    public int read(int accountNumber) {
         Message message = new Message(MessageType.READ_REQUEST, accountNumber);
         
         int balance = -1;
@@ -106,10 +102,6 @@ public class TransactionServerProxy {
         } catch(ClassNotFoundException e){
           System.out.println(e);
         }
-        
-      if(balance == -1){
-        throw new Exception();
-      }
       
       return balance;
     }

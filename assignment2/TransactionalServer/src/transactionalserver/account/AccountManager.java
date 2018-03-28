@@ -1,7 +1,6 @@
 package transactionalserver.account;
 
 import java.util.ArrayList;
-import transactionalserver.client.TransactionClient;
 import transactionalserver.lock.LockManager;
 import transactionalserver.lock.LockType;
 import transactionalserver.transaction.Transaction;
@@ -35,23 +34,35 @@ public class AccountManager {
     }
     
     /*
-    Returns all accounts
+    * Returns all accounts
     */
      public ArrayList<Account> getAccounts(){
         return accounts;
     }
      
+     /**
+      * Retrieves a single account from the account list
+      * @param accountID    the ID of the account to get
+      * @return             the account to return
+      */
      public Account getAccount(int accountID){
          return accounts.get(accountID);
      }
      
      /*
-     Read action for an account
+     * Read action for an account
      */
-     
+
+     /**
+      * Read balance for an account
+      * 
+      * @param account      the account to read the balance for
+      * @param transaction  the transaction that has the lock on the account
+      * @return             the balance of the account
+      */
     public int read(Account account, Transaction transaction){
         lockManager.lock(transaction, account, LockType.READ);
-                return account.getBalance();
+        return account.getBalance();
     }
     
     /*
