@@ -15,7 +15,7 @@ import transactionalserver.transaction.Transaction;
  *  It will acquire and release locks for the AccountManager.
  *  Unlocking will be done in the TransactionsMaangerWorker.
  */
-public class LockManager implements LockType{
+public class LockManager{
     private boolean applyLocking;
     //Some kind of data structure to hold locks info
     private HashMap<Account, Lock> locks;
