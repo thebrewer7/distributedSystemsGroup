@@ -43,7 +43,7 @@ public class Lock{
         transaction.addLock(this);
       }
       else if(!lockHolders.contains(transaction)){
-          lockHolders.add(transaction)
+          lockHolders.add(transaction);
       }
       else if(!lockHolders.contains(transaction) && currentLockType == LockType.READ && newLockType == LockType.WRITE){
           currentLockType = newLockType;
