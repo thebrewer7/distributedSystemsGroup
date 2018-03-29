@@ -57,7 +57,7 @@ public class Lock{
     */
     public synchronized void release(Transaction transaction){
       lockHolders.remove(transaction);
-      if(lockRequestors.isEmpty()){
+      if(lockHolders.isEmpty()){
         currentLockType = LockType.EMPTY_LOCK;
       }
       notifyAll();
