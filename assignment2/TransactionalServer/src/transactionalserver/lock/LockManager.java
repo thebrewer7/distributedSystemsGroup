@@ -37,7 +37,7 @@ public class LockManager{
     /*
     Sets a lock on an account
     */
-    void lock(Account account, Transaction transaction, LockType lockType){
+    public void lock(Account account, Transaction transaction, LockType lockType){
 
         
         Lock found;
@@ -60,7 +60,7 @@ public class LockManager{
     /* 
     Unlocks a lock on an account
     */
-    void unLock(Transaction transaction){
+    public void unLock(Transaction transaction){
         if (!applyLocking){
             return;
             }
