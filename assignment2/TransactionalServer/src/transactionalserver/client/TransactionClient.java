@@ -19,7 +19,9 @@ public class TransactionClient {
     private int initialBalance;
     private String host;
     private int port;
+
     //private StringBuilder log
+
 
     /**
      * Constructor
@@ -87,10 +89,10 @@ public class TransactionClient {
             
             // close transaction
             transaction.closeTransaction();
+
             System.out.println("Transaction " + transID + " has finished.");
           }
         }.start();
       }
     }
-
 }

@@ -110,8 +110,7 @@ public class TransactionServerProxy {
     * translates the clients withdraw into what is happening with it
     * behind the scenes
     */
-    public void write(int accountNumber, int amount){
-        
+    public void write(int accountNumber, int amount){        
       int[] content = new int[]{accountNumber, amount};
       Message message = new Message(MessageType.WRITE_REQUEST, 
         accountNumber, amount);
@@ -123,6 +122,5 @@ public class TransactionServerProxy {
         } catch(IOException e){
             System.out.println(e);
         }
-        
     }
 }
