@@ -33,11 +33,11 @@ public class LockManager{
        //initialize structure holding locks
        locks = new HashMap<>();  
    }   
-    }
+       
     /*
     Sets a lock on an account
     */
-    void lock(Account account, Transaction transaction, LockType lockType, applyLocking){
+    void lock(Account account, Transaction transaction, LockType lockType){
 
         
         Lock found;
