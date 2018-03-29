@@ -11,6 +11,7 @@ import transactionalserver.MessageType;
 import transactionalserver.account.Account;
 import transactionalserver.account.AccountManager;
 import transactionalserver.lock.LockManager;
+import transactionalserver.lock.LockType;
 
 /**
  * The TransactionManager handles all of the transactions
@@ -163,6 +164,9 @@ public class TransactionManager {
            int accountID = ((int[]) message.getContent())[0];
            account =  accountManager.getAccount(accountID);
            
+           // acquire lock to read
+           lockManager.lock(account, transaction, LockType.READ);
+           
            /**
             * TODO:
             * transaction.log(TRANSactionmanagerworker.run READREQUEST FOR ACCOUNTNUMBER)
@@ -186,16 +190,16 @@ public class TransactionManager {
             * int[0] = account id
             * int[1] = new balance
             */
+           // get the account to change the balance & the new balance
            int[] content = (int[]) message.getContent();
            int accountID = content[0];
            account = accountManager.getAccount(accountID);
            currentBalance = content[1];
            
-           try{
-               toClient.writeObject(currentBalance);
-           } catch(IOException e){
-               System.out.println(e);
-           }
+           // change the balance on the account object
+           lockManager.lock(account, transaction, LockType.WRITE);
+           account.setBalance(currentBalance);
+           
            
            /**
             *  TODO: 

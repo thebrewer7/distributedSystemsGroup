@@ -14,7 +14,7 @@ public class Account{
     }
   
     public void setBalance(int amount){
-        balance+= amount;   
+        balance= amount;   
     }
     
     public int getBalance(){
