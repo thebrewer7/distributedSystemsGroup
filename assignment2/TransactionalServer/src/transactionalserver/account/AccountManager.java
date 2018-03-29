@@ -61,7 +61,7 @@ public class AccountManager {
       * @return             the balance of the account
       */
     public int read(Account account, Transaction transaction){
-        lockManager.lock(transaction, account, LockType.READ);
+        lockManager.lock(account, transaction, LockType.READ);
         return account.getBalance();
     }
     
@@ -69,7 +69,7 @@ public class AccountManager {
     Write action for an account
     */
     public int write(Account account, Transaction transaction,int balance){
-        lockManager.lock(transaction, account, LockType.WRITE);
+        lockManager.lock(account, transaction, LockType.WRITE);
         account.setBalance(balance);
         return balance;     
     }  
