@@ -95,4 +95,9 @@ public class TransactionClient {
         }.start();
       }
     }
+    
+    public static void main(String[] args){
+        TransactionClient transClient = new TransactionClient("src/transactionalserver/server/config.properties");
+        transClient.run()
+    }
 }
