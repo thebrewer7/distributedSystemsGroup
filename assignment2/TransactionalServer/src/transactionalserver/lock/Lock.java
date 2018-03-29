@@ -12,19 +12,16 @@ import transactionalserver.transaction.Transaction;
  * Represents a lock for an Account object. If it's locked, then the Account
  * object cannot be accessed
  */
-public class Lock {
+public class Lock implements LockType {
     Account account;
     LockType currentLockType;
     ArrayList<Transaction> lockHolders;
-    HashMap<Transaction, Object[]> lockRequestors;  //transactions requesting a 
-                                                    //this lock
 
     /**
      *  Constructor
      */
     public Lock(Account account){
       this.lockHolders = new ArrayList();
-      this.lockRequestors = new HashMap();
       this.account = account;
       this.currentLockType = LockType.EMPTY_LOCK;
     }
@@ -32,32 +29,25 @@ public class Lock {
     /**
     * checks if there is conflict, if not it creates the lock
     */
-    public void acquire(Transaction transaction, LockType newLockType){
-//      transaction.lock(Lock acquire);
+    public synchronized void acquire(Transaction transaction, LockType newLockType){
       while(isConflict(transaction, newLockType)){
-              //transaction.log("lock acquire");
-//        lockRequestors.put(transaction, newLockType);
           try {
             this.wait();
           } catch (InterruptedException e) {
               System.out.println(e);
           }
-        lockRequestors.remove(transaction);
-        //transaction.log("lock acquire");
       }
       if(lockHolders.isEmpty()){
         lockHolders.add(transaction);
         currentLockType = newLockType;
         transaction.addLock(this);
-        //transaction.log("lock acquire");
       }
       else if(!lockHolders.contains(transaction)){
-        Iterator<Transaction> lockIterator = lockHolders.iterator();
-        Transaction otherTransaction;
-        //StringBuilder logString = new StringBuilder("lock acquire");
-        while(lockIterator.hasNext()){
-          otherTransaction = lockIterator.next();
-        }
+          lockHolders.add(transaction)
+      }
+      else if(!lockHolders.contains(transaction) && currentLockType == LockType.READ && newLockType == LockType.WRITE){
+          currentLockType = newLockType;
+          //TODO: Promote lock
       }
     }
 
@@ -65,13 +55,10 @@ public class Lock {
     * checks if there are lock holders, if there are,
     * set lock type to be an empty lock and free
     */
-    public void release(Transaction transaction){
+    public synchronized void release(Transaction transaction){
       lockHolders.remove(transaction);
-      if(!lockHolders.isEmpty()){
+      if(lockRequestors.isEmpty()){
         currentLockType = LockType.EMPTY_LOCK;
-        if(lockRequestors.isEmpty()){
-          currentLockType = LockType.EMPTY_LOCK;
-        }
       }
       notifyAll();
     }
@@ -84,31 +71,17 @@ public class Lock {
       if(lockHolders.isEmpty()){
         return false;
       }
-      else if(currentLockType == LockType.READ && newLockType == 
-              LockType.READ){
+      else if(currentLockType == LockType.READ && newLockType == LockType.READ){
           return false;
       }
-      // if the transactions wants to promote the lock and it's the only hodler
-      else if(currentLockType == LockType.READ && newLockType == 
-              LockType.WRITE && lockHolders.size() == 1  && lockHolders
-              .contains(transaction)){
-          return true;
+      else if(lockHolders.size() == 1){
+          return false;   
       }
       /**
-       * All other cases are conflicts:
-       *    * currentLockType  == READ && newLockType == WRITE 
-       *        & lockHolder size is greater than 1
-       *    * currentLockType == WRITE (can't demote & can't share write locks)
+       * otherwise its a conflict
        */
       else{
-          return false;
+          return true;
       }
-      /**
-       * TODO: check other cases for conflicts
-       * 
-       * if lockType == write, it's a conflict
-       * if newLockType == write, it's a conflict
-       * if lockType ==  read && newLockType == read, no conflict
-       */
     }
 }
