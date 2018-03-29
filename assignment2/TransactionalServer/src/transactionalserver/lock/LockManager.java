@@ -38,8 +38,6 @@ public class LockManager{
     Sets a lock on an account
     */
     public void lock(Account account, Transaction transaction, LockType lockType){
-
-        
         Lock found;
         
         // prevents race conditions
@@ -65,7 +63,7 @@ public class LockManager{
             return;
             }
             //find the lock associated with the specific account
-            found = locks.get(account);
+            Lock found = locks.get(account);
             
             if(found == null){
                found = new Lock(account);
