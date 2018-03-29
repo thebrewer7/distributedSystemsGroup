@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import transactionalserver.account.Account;
 import transactionalserver.transaction.Transaction;
-import transactionalserver.lock.LockType;
 
 /**
  * Represents a lock for an Account object. If it's locked, then the Account
