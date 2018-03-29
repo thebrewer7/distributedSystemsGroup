@@ -30,7 +30,7 @@ public class TransactionServerProxy {
         // get host
         InetAddress inetHost = null;
          try{
-             inetHost = InetAddress.getByName(host);
+             inetHost = InetAddress.getByName("127.0.0.1");
          } catch(UnknownHostException e){
              System.out.println(e);
          }

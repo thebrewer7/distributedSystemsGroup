@@ -1,10 +1,12 @@
 package transactionalserver;
 
+import java.io.Serializable;
+
 /**
  * Represents a message that would check the request type
  * and also the account number
  */
-public class Message {
+public class Message implements Serializable {
     private MessageType messageType;
     private int accountNumber;
     private int amount;

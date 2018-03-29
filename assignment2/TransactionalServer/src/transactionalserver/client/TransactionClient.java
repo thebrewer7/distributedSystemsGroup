@@ -38,12 +38,12 @@ public class TransactionClient {
         
         // get host & port
         this.port = Integer.valueOf(prop.getProperty("port"));
-        String hostInt = prop.getProperty("host");
-        try{
-            InetAddress host = InetAddress.getByName(hostInt);                
-        } catch(UnknownHostException e){
-            System.out.println(e);
-        }
+        this.host = prop.getProperty("host");
+//        try{
+//            InetAddress host = InetAddress.getByName(hostInt);
+//        } catch(UnknownHostException e){
+//            System.out.println(e);
+//        }
         
         // get the number of accounts and transactions
         this.numberAccounts = Integer.valueOf(prop.getProperty("numAccounts"));
@@ -98,6 +98,6 @@ public class TransactionClient {
     
     public static void main(String[] args){
         TransactionClient transClient = new TransactionClient("src/transactionalserver/server/config.properties");
-        transClient.run()
+        transClient.run();
     }
 }
