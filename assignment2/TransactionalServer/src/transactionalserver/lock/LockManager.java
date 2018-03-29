@@ -38,38 +38,35 @@ public class LockManager{
     Sets a lock on an account
     */
     public void lock(Account account, Transaction transaction, LockType lockType){
-        Lock found;
-        
-        // prevents race conditions
-        synchronized(this){
-            if (!applyLocking){
-            return;
-            }
-            //find the lock associated with the specific account
-            found = locks.get(account);
-            
-            if(found == null){
-               found = new Lock(lock);
-               locks.put(account, found);
-            } 
-        }
-        found.acquire(transaction, lockType);
-    }
-    /* 
-    Unlocks a lock on an account
-    */
-    public void unLock(Transaction transaction){
-        if (!applyLocking){
-            return;
-            }
-            //find the lock associated with the specific account
-            Lock found = locks.get(account);
-            
-            if(found == null){
-               found = new Lock(account);
-               locks.put(account, found);
-            } 
-        }
-        found.acquire(transaction, lockType);
-    }
+       Lock found;
+       
+       // prevents race conditions
+       synchronized(this){
+           if (!applyLocking){
+              return;
+           }
+           //find the lock associated with the specific account
+           found = locks.get(account);
+           
+           if(found == null){
+              found = new Lock(account);
+              locks.put(account, found);
+           }
+       }
+       found.acquire(transaction, lockType);
+   }
+ 
+  /*
+  Unlocks a lock on a transaction
+  */
+  public void unLock(Transaction transaction){
+      if (!applyLocking){
+          return;
+      }
+      Iterator<Lock> lockIterator = transaction.getLocks().listIterator();
+      while (lockIterator.hasNext()){
+          Lock currentLock = lockIterator.next();
+          currentLock.release(transaction);
+      }
+  }
 }
