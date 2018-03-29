@@ -1,6 +1,9 @@
 package transactionalserver.account;
 
 import java.util.ArrayList;
+import transactionalserver.lock.LockManager;
+import transactionalserver.lock.LockType;
+import transactionalserver.transaction.Transaction;
 
 /**
  *  Handles the accounts and initializing them.
@@ -12,40 +15,61 @@ import java.util.ArrayList;
  *  This class will call the LockManager to acquire locks for reads & writes
  */
 public class AccountManager {
-    
+    private LockManager lockManager;
     private ArrayList<Account> accounts;
     int numberAccounts;
     int initialBalance;
     /*
       Constructor
      */
-    public AccountManager(int numberAccounts, int initialBalance){
-        //create a new account
+    public AccountManager(int numberAccounts, int initialBalance, 
+            LockManager lockMaanger){
+        //create all of the accounts
         accounts = new ArrayList();
-        
+       for(int i=0; i<numberAccounts; i++){
+           accounts.add(new Account(initialBalance));
+       }
+       
+       this.lockManager = lockManager;
     }
     
     /*
-    Returns all accounts
+    * Returns all accounts
     */
      public ArrayList<Account> getAccounts(){
         return accounts;
     }
      
-     /*
-     Read action for an account
-     */
+     /**
+      * Retrieves a single account from the account list
+      * @param accountID    the ID of the account to get
+      * @return             the account to return
+      */
+     public Account getAccount(int accountID){
+         return accounts.get(accountID);
+     }
      
-    public int read(Account account, TransactionClinet transaction){
-        (transactionServer.lockManager).lock(account,transaction, READLOCK);
-                return account.getBalance();
+     /*
+     * Read action for an account
+     */
+
+     /**
+      * Read balance for an account
+      * 
+      * @param account      the account to read the balance for
+      * @param transaction  the transaction that has the lock on the account
+      * @return             the balance of the account
+      */
+    public int read(Account account, Transaction transaction){
+        lockManager.lock(transaction, account, LockType.READ);
+        return account.getBalance();
     }
     
     /*
     Write action for an account
     */
     public int write(Account account, Transaction transaction,int balance){
-        (transactionServer.lockManager).lock(account,transaction, WRITELOCK);
+        lockManager.lock(transaction, account, LockType.WRITE);
         account.setBalance(balance);
         return balance;     
     }  

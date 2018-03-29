@@ -1,50 +1,53 @@
 package transactionalserver.lock;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import transactionalserver.account.Account;
+import transactionalserver.transaction.Transaction;
+
 /**
  * Represents a lock for an Account object. If it's locked, then the Account
  * object cannot be accessed
  */
-public class Lock {
+public class Lock{
     Account account;
-    int currentLockType;
+    LockType currentLockType;
     ArrayList<Transaction> lockHolders;
-    HashMap<Transaction, Object[]> lockRequestors;
 
     /**
      *  Constructor
      */
     public Lock(Account account){
       this.lockHolders = new ArrayList();
-      this.lockRequestors = new HashMap();
       this.account = account;
-      this.currentLockType = "EMPTY_LOCK";
+      this.currentLockType = LockType.EMPTY_LOCK;
     }
 
     /**
     * checks if there is conflict, if not it creates the lock
     */
-    public void acquire(Transaction transaction, int newLockType){
-      transaction.lock(Lock acquire);
+    public synchronized void acquire(Transaction transaction, LockType newLockType){
       while(isConflict(transaction, newLockType)){
-        //transaction.log("lock acquire");
-        addLockRequestor(transaction, newLockType);
-        wait();
-        removeLockRequestor(transaction);
-        //transaction.log("lock acquire");
+          try {
+            this.wait();
+          } catch (InterruptedException e) {
+              System.out.println(e);
+          }
       }
       if(lockHolders.isEmpty()){
         lockHolders.add(transaction);
         currentLockType = newLockType;
         transaction.addLock(this);
-        //transaction.log("lock acquire");
       }
-      elseif(!lockHodlers.contains(transaction)){
-        Iterator<transaction> lockIterator = lockHolders.iterator();
-        Transaction otherTransaction;
-        //StringBuilder logString = new StringBuilder("lock acquire");
-        while(lockIterator.hasNext()){
-          otherTransaction = lockIterator.next();
-        }
+      else if(!lockHolders.contains(transaction)){
+          lockHolders.add(transaction)
+      }
+      else if(!lockHolders.contains(transaction) && currentLockType == LockType.READ && newLockType == LockType.WRITE){
+          currentLockType = newLockType;
+          //TODO: Promote lock
       }
     }
 
@@ -52,29 +55,33 @@ public class Lock {
     * checks if there are lock holders, if there are,
     * set lock type to be an empty lock and free
     */
-    public void release(Transaction transaction){
+    public synchronized void release(Transaction transaction){
       lockHolders.remove(transaction);
-      if(!lockHolders.isEmpty()){
-        currentLockType = "EMPTY_LOCK";
-        if(lockRequestors.isEmpty()){
-          //TODO:
-        }
+      if(lockRequestors.isEmpty()){
+        currentLockType = LockType.EMPTY_LOCK;
       }
       notifyAll();
     }
 
     /**
-    * checks if there are lock holders, if there are,
-    * set lock type to be an empty lock and free
+    *   Checks if the transaction trying to acquire the specific lock type is 
+    *   conflict free
     */
-    public Boolean isConflict(Transaction transaction, int newLockType)){
+    public Boolean isConflict(Transaction transaction, LockType newLockType){
       if(lockHolders.isEmpty()){
-        //transaction.log("Is conflict on current lock");
         return false;
       }
-      else if(lockHolders.size() == 1 && lockHolders.contains(transaction)){
-        //TODO:
-        return true;
+      else if(currentLockType == LockType.READ && newLockType == LockType.READ){
+          return false;
+      }
+      else if(lockHolders.size() == 1){
+          return false;   
+      }
+      /**
+       * otherwise its a conflict
+       */
+      else{
+          return true;
       }
     }
 }

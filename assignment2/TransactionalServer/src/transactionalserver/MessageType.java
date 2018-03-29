@@ -10,8 +10,14 @@ package transactionalserver;
  * @author Chandler
  */
 public enum MessageType {
-    OPEN_TRANSACTION,
-    CLOSE_TRANSACTION,
-    READ_REQUEST,
-    WRITE_REQUEST
+    OPEN_TRANSACTION (0),
+    CLOSE_TRANSACTION (1),
+    READ_REQUEST (2),
+    WRITE_REQUEST (3);
+    
+    private int value;
+    
+    MessageType(int value){
+        this.value = value;
+    }
 }

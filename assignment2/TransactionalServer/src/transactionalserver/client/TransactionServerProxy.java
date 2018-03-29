@@ -1,5 +1,14 @@
 package transactionalserver.client;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import transactionalserver.Message;
+import transactionalserver.MessageType;
+
 /**
  *  The TransactionServerProxy communicates with the server side for a Client
  *  object.
@@ -9,27 +18,53 @@ package transactionalserver.client;
  *  high-level API calls to low-level network messages
  */
 public class TransactionServerProxy {
+    private ObjectInputStream fromServer;
+    private ObjectOutputStream toServer;
 
     /**
      * Constructor
      * created with a host and port number
      */
     public TransactionServerProxy(String host, int port){
-      this.host = host;
-      this.port = port;
+        // -------- Connect to server
+        // get host
+        InetAddress inetHost = null;
+         try{
+             inetHost = InetAddress.getByName(host);
+         } catch(UnknownHostException e){
+             System.out.println(e);
+         }
+        
+         // connect to server's socket & input/output streams
+         Socket clientSocket = null;
+         try{
+             clientSocket = new Socket(inetHost, port);
+             toServer = new ObjectOutputStream(clientSocket.getOutputStream());
+             fromServer = new ObjectInputStream(clientSocket.getInputStream());
+         } catch(IOException e){
+             System.out.println(e);
+         }
+      
     }
 
     /**
-    * opens a transaction and creates a socket stream
-    * opens a transactionID from the input stream
+    * opens a transaction and gets a transactionID from the input stream
     */
-    public int openTransaction(){
-      Message openTransMessage = new Message("OPEN_TRANSACTION", null)
-      dbConnection = new Socket(host, port);
-      writeToNet = new ObjectOutputStream(dbConnection.getOutputStream());
-      readFromNet = new ObjectInputStream(dbConnection.getInputStream());
-      transID = (int) readFromNet.readObject();
-
+        public int openTransaction(){
+      Message openTransMessage = new Message(MessageType.OPEN_TRANSACTION);
+      
+      // connect to server
+      int transID = -1;
+      try{
+          //tell server it wants to open a transactions
+          toServer.writeObject(openTransMessage);
+          
+          // get Transaction ID
+          transID = (int) fromServer.readObject();
+      } catch(IOException | ClassNotFoundException e){
+          System.out.println(e);
+      }
+      
       return transID;
     }
 
@@ -37,19 +72,37 @@ public class TransactionServerProxy {
     * closes a transaction
     */
     public void closeTransaction(){
-      Message closeTransMessage = new Message("CLOSE_TRANSACTION", null);
-      //TODO:
+        Message message = new Message(MessageType.CLOSE_TRANSACTION);
+        
+        // connect to server
+      int transID = -1;
+      try{          
+          //tell server it wants to open a transactions
+          toServer.writeObject(message);
+      } catch(IOException e){
+          System.out.println(e);
+      }
     }
 
     /**
     * reads the balance for a given account number and return that balance
     */
-    public int read(int accountNumber){
-      Message readMessage = new Message("READ_REQUEST", new int(accountNumber));
-      int balance = null;
-      writeToNet.writeObject(readMessage);
-      balance = (int) readFromNet.readObject();
-
+    public int read(int accountNumber) {
+        Message message = new Message(MessageType.READ_REQUEST, accountNumber);
+        
+        int balance = -1;
+        try{
+            // send account ID to server
+            toServer.writeObject(message);
+            
+            // get balance of the account
+            balance = (int) fromServer.readObject();
+        } catch(IOException e){
+            System.out.println(e);
+        } catch(ClassNotFoundException e){
+          System.out.println(e);
+        }
+      
       return balance;
     }
 
@@ -57,11 +110,17 @@ public class TransactionServerProxy {
     * translates the clients withdraw into what is happening with it
     * behind the scenes
     */
-    public void write(int accountNumber, int amount){
-      Object[] content = new Object[]{accountNumber, amount};
-      Message writeMessage = new Message("WRITE_REQUEST", new int(accountNumber), amount);
-      int balance += amount;
-      writeToNet.writeObject(writeMessage);
-      balance = (int) readFromNet.readObject();
+    public void write(int accountNumber, int amount){        
+      int[] content = new int[]{accountNumber, amount};
+      Message message = new Message(MessageType.WRITE_REQUEST, 
+        accountNumber, amount);
+//      int balance += amount;
+
+        try{
+            // send the balanc it wants to do
+            toServer.writeObject(message);
+        } catch(IOException e){
+            System.out.println(e);
+        }
     }
 }

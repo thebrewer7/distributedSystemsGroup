@@ -1,5 +1,12 @@
 package transactionalserver.client;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Properties;
+import java.util.Random;
+
 /**
  *  This represents a Client that will communicate with the
  *  TransactionServerProxy which will in turn communicate with the Server side.
@@ -12,39 +19,77 @@ public class TransactionClient {
     private int initialBalance;
     private String host;
     private int port;
-    //private StringBuilder log;
+
+    //private StringBuilder log
+
 
     /**
      * Constructor
      * takes in a value that represents the clients account value
      */
-    public TransactionClient(String clientPropertiesFile, serverPropertiesFile){
-     Properties serverProperties = new PropertyHandler(serverPropertiesFile);
-     host = serverProperties.getProperty("host");
-     port = int.parseInt(serverProperties.getProperty("port"));
-     numberAccounts = int.parseInt(serverProperties.getProperty("numAccounts"));
-     numberTransactions = int.parseInt(serverProperties.getProperty("numTransactions"));
-     initialBalance = int.parseInt(serverProperties.getProperty("initialBalance"));
+    public TransactionClient(String propertiesFile){
+        // load properties
+        Properties prop = new Properties();
+        try{
+            prop.load(new FileInputStream(propertiesFile));
+        } catch(IOException e){
+            System.out.println(e);
+        }
+        
+        // get host & port
+        this.port = Integer.valueOf(prop.getProperty("port"));
+        String hostInt = prop.getProperty("host");
+        try{
+            InetAddress host = InetAddress.getByName(hostInt);                
+        } catch(UnknownHostException e){
+            System.out.println(e);
+        }
+        
+        // get the number of accounts and transactions
+        this.numberAccounts = Integer.valueOf(prop.getProperty("numAccounts"));
+        this.numberTransactions = Integer.valueOf(prop.getProperty
+            ("numTransactions"));
+        this.initialBalance = Integer.valueOf(prop.getProperty
+            ("initialBalance"));
     }
 
+    /**
+     * The bulk of the withdraws and deposits for multiple accounts and 
+     * transactions
+     */
     public void run(){
-      for(int i=0; i<numberTransactions; i++){
+         for(int i=0; i<numberTransactions; i++){
         new Thread(){
           public void run(){
-            TransactionServerProxy transaction = new TransactionServerProxy(host,port);
-            int transID = transaction.openTransaction()
+            TransactionServerProxy transaction = new 
+                TransactionServerProxy(host,port);
+            
+            int transID = transaction.openTransaction();
             System.out.println("Transaction " + transID + " has started.");
-            int accountMovingFrom = (int) Math.floor(Math.random() * numberAccounts);
-            int accountMovingTo = (int) Math.floor(Math.random() * numberAccounts);
-            int amountToMove = (int) Math.ceil(Math.random() * initialBalance);
+            
+            // determining transferring of funds between accounts
+            Random rand = new Random();
+            int accountMovingFrom = rand.nextInt(numberAccounts);
+            int accountMovingTo = rand.nextInt(numberAccounts);
+            int amountToMove = rand.nextInt(initialBalance);
+            
+            System.out.println("Transaction " + transID + " going from account "
+                    + accountMovingFrom + " to account " + accountMovingTo 
+                    + ".");
+
+            // ------- Begin Transactions
+            // withdraw from accountMovingFrom
             int balance;
-            System.out.println("Transaction " + transID + " going from account " + accountMovingFrom +
-            " to account " + accountMovingTo + ".");
             balance = transaction.read(accountMovingFrom);
             transaction.write(accountMovingFrom, balance-amountToMove);
+            
+            // deposit to accountMovingTo
             balance = transaction.read(accountMovingTo);
             transaction.write(accountMovingTo, balance+amountToMove);
-            transaction.closeTransaction()
+            
+            // close transaction
+            transaction.closeTransaction();
+
             System.out.println("Transaction " + transID + " has finished.");
           }
         }.start();

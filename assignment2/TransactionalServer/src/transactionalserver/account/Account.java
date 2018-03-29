@@ -1,7 +1,5 @@
 package transactionalserver.account;
 
-import java.util.UUID;
-
 /**
  *  Represents a bank account. Accounts can have negative balances.
  * 
