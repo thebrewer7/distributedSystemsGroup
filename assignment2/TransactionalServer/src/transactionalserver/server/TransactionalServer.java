@@ -32,7 +32,7 @@ public class TransactionalServer implements Runnable{
         accountManager = new AccountManager(100, 100, lockManager);
         transactionManager = new TransactionManager(accountManager, 
                 lockManager);
-        lockManager = new LockManager("filePath");
+        lockManager = new LockManager("src/transactionalserver/server/clientproperties.properties");
     }
     
     public void run(){
