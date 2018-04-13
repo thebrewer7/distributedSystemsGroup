@@ -7,8 +7,8 @@ import appserver.comm.Message;
 import static appserver.comm.MessageTypes.JOB_REQUEST;
 import static appserver.comm.MessageTypes.REGISTER_SATELLITE;
 import appserver.job.Tool;
-import java.io.FileInputStream;
 import appserver.server.Server;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,24 +31,17 @@ import utils.PropertyHandler;
  * @author Dr.-Ing. Wolf-Dieter Otte
  */
 public class Satellite extends Thread {
-    // Class Loading Related Objects
+
     private ConnectivityInfo satelliteInfo = new ConnectivityInfo();
     private ConnectivityInfo serverInfo = new ConnectivityInfo();
     private HTTPClassLoader classLoader = null;
     private HashMap toolsCache = null;
-    
-    // Network Related Objects
-    private ServerSocket serverSocket = null;
-    private int port;
-    private InetAddress host = null;
-    
-    // Other needed variables
-    Properties satelliteProps = new Properties();
 
     public Satellite(String satellitePropertiesFile, String classLoaderPropertiesFile, String serverPropertiesFile) {
         
         // read this satellite's properties and populate satelliteInfo object,
         // which later on will be sent to the server
+        Properties satelliteProps = new Properties();
         try{
             satelliteProps.load(new FileInputStream(satellitePropertiesFile));
         }catch(IOException e){
@@ -95,32 +88,12 @@ public class Satellite extends Thread {
         
         // create server socket
         // ---------------------------------------------------------------
-        try{
-            // create ServerSocket
-            serverSocket = new ServerSocket(port);
-        } catch(IOException e){
-            System.out.println("Satellite: creating serverSocker");
-            System.out.println(e);
-        }
+        // ...
         
-                
+        
         // start taking job requests in a server loop
         // ---------------------------------------------------------------
-        try{
-            // loop that is always listening for new clients
-            // if a clien connects it sends the client to ServerThread
-            while(true){
-                System.out.println("Waiting for clients");
-                
-                //connect to client
-                Socket socket = serverSocket.accept();
-                System.out.println("Connected to a new client");
-                new Thread(new SatelliteThread(socket, this)).start();
-            }
-        } catch(IOException e){
-            System.out.println("Satellite: conencting to client");
-            System.out.println(e);
-        }
+        // ...
     }
 
     // inner helper class that is instanciated in above server loop and processes single job requests
@@ -140,20 +113,31 @@ public class Satellite extends Thread {
         @Override
         public void run() {
             // setting up object streams
-            // ...
-            
             // reading message
-            // ...
+            try{
+                ObjectInputStream fromClient = new ObjectInputStream(jobRequest.getInputStream());
+                ObjectOutputStream toClient = new ObjectOutputStream(jobRequest.getOutputStream());
+                Message message = (Message)(fromClient.readObject());
+            }catch(IOException e){
+                System.out.println(e);
+            }catch(ClassNotFoundException e){
+                System.out.println(e);
+            }
             
             switch (message.getType()) {
                 case JOB_REQUEST:
                     // processing job request
-                    // ...
+                    jobRequest();
                     break;
 
                 default:
                     System.err.println("[SatelliteThread.run] Warning: Message type not implemented");
             }
+        }
+        
+        // handle JOB_REQUEST message
+        public void jobRequest(){
+            
         }
     }
 
@@ -162,35 +146,11 @@ public class Satellite extends Thread {
      * If the tool has been used before, it is returned immediately out of the cache,
      * otherwise it is loaded dynamically
      */
-    public Tool getToolObject(String toolString) throws UnknownToolException, ClassNotFoundException, 
-            InstantiationException, IllegalAccessException {
+    public Tool getToolObject(String toolClassString) throws UnknownToolException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         Tool toolObject = null;
-        //try to get tool object if its in the cache
-        toolObject = (Tool) toolsCache.get(toolString);
 
-        // check if the wanted Tool Object is already in cache
-        if(toolObject == null){
-            // the wanted object is not in cache, so we must retrieve it
-            String toolClassString = satelliteProps.getProperty(toolString);
-            
-            // if it's still null, then it the class doesn't exist
-            if(toolClassString == null){
-                throw new UnknownToolException();
-            }
-            
-            System.out.println("\n Tool's Class: " + toolClassString);
-            
-            // load the class
-            Class toolClass = classLoader.loadClass(toolClassString);
-            toolObject = (Tool) toolClass.newInstance();
-            
-            // store class in cache
-            toolsCache.put(toolString, toolObject);          
-        }
-        else{
-            System.out.println("Tool: " + toolString + " already in cache");
-        }
+        // ...
         
         return toolObject;
     }
