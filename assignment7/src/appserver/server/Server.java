@@ -11,7 +11,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 import utils.PropertyHandler;
-
+import java.io.FileInputStream;
+import java.util.Properties;
 /**
  *
  * @author Dr.-Ing. Wolf-Dieter Otte
@@ -27,9 +28,17 @@ public class Server {
 
         // create satellite manager and load manager
         // ...
+        satelliteManager = new SatelliteManager();
+        loadManager = new LoadManager();
         
         // read server properties and create server socket
         // ...
+        Properties props = new Properties();
+        try{
+            props.load(new FileInputStream(serverPropertiesFile));
+        }catch(IOException e){
+            System.out.println(e);
+        }
     }
 
     public void run() {
