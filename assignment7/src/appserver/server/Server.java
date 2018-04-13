@@ -14,6 +14,8 @@ import utils.PropertyHandler;
 import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.util.Properties;
+import java.net.UnknownHostException;
+
 /**
  *
  * @author Dr.-Ing. Wolf-Dieter Otte
@@ -39,12 +41,15 @@ public class Server {
         // read server properties and create server socket
         // ...
         Properties props = new Properties();
-        try{
+        try{     
             props.load(new FileInputStream(serverPropertiesFile));
             
             //get host & port number
             port = Integer.valueOf(props.getProperty("PORT"));
             host = InetAddress.getByName(props.getProperty("HOST"));
+            
+            //create server socket
+            serverSocket = new ServerSocket(port);
         }catch(IOException e){
             System.out.println(e);
         }
@@ -55,9 +60,6 @@ public class Server {
     // when a request comes in, a ServerThread object is spawned
 
         try{
-            // create ServerSocket
-            serverSocket = new ServerSocket(port);
-            
             // loop that is always listening for new clients
             // if a clien connects it sends the client to ServerThread
             while(true){
@@ -89,7 +91,15 @@ public class Server {
         public void run() {
             // set up object streams and read message
             // ...
-
+            try{
+                readFromNet = new ObjectInputStream(client.getInputStream());
+                writeToNet = new ObjectOutputStream(client.getOutputStream());
+                message = (Message) (readFromNet.readObject());
+            }catch(IOException e){
+                System.out.println(e);
+            }catch(ClassNotFoundException e){
+                System.out.println(e);
+            }
             
             // process message
             switch (message.getType()) {
