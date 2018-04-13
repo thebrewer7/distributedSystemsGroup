@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.util.Properties;
 import utils.PropertyHandler;
 import java.io.FileInputStream;
+import java.net.InetAddress;
 import java.util.Properties;
 /**
  *
@@ -22,7 +23,11 @@ public class Server {
     // Singleton objects - there is only one of them. For simplicity, this is not enforced though ...
     static SatelliteManager satelliteManager = null;
     static LoadManager loadManager = null;
+
+    // Network objects
     static ServerSocket serverSocket = null;
+    private int port = 0;
+    private InetAddress host = null;
 
     public Server(String serverPropertiesFile) {
 
@@ -36,6 +41,10 @@ public class Server {
         Properties props = new Properties();
         try{
             props.load(new FileInputStream(serverPropertiesFile));
+            
+            //get host & port number
+            port = Integer.valueOf(props.getProperty("PORT"));
+            host = InetAddress.getByName(props.getProperty("HOST"));
         }catch(IOException e){
             System.out.println(e);
         }
@@ -44,7 +53,24 @@ public class Server {
     public void run() {
     // serve clients in server loop ...
     // when a request comes in, a ServerThread object is spawned
-    // ...
+    
+        try{
+            // create ServerSocket
+            serverSocket = new ServerSocket(port);
+            
+            // loop that is always listening for new clients
+            // if a clien connects it sends the client to ServerThread
+            while(true){
+                System.out.println("Waiting for clients");
+                
+                //connect to client
+                Socket socket = serverSocket.accept();
+                System.out.println("Connected to a new client");
+                new Thread(new ServerThread(socket)).start();
+            }
+        } catch(IOException e){
+            
+        }
     }
 
     // objects of this helper class communicate with satellites or clients
