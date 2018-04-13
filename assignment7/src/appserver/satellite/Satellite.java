@@ -36,7 +36,7 @@ public class Satellite extends Thread {
     private ConnectivityInfo serverInfo = new ConnectivityInfo();
     private HTTPClassLoader classLoader = null;
     private HashMap toolsCache = null;
-
+    
     // Network Related Objects
     private ServerSocket serverSocket = null;
     private int port;
@@ -96,7 +96,15 @@ public class Satellite extends Thread {
         try{
             // create ServerSocket
             serverSocket = new ServerSocket(port);
-            
+        } catch(IOException e){
+            System.out.println("Satellite: creating serverSocker");
+            System.out.println(e);
+        }
+        
+                
+        // start taking job requests in a server loop
+        // ---------------------------------------------------------------
+        try{
             // loop that is always listening for new clients
             // if a clien connects it sends the client to ServerThread
             while(true){
@@ -108,13 +116,9 @@ public class Satellite extends Thread {
                 new Thread(new SatelliteThread(socket, this)).start();
             }
         } catch(IOException e){
-            
+            System.out.println("Satellite: conencting to client");
+            System.out.println(e);
         }
-        
-        
-        // start taking job requests in a server loop
-        // ---------------------------------------------------------------
-        // ...
     }
 
     // inner helper class that is instanciated in above server loop and processes single job requests
