@@ -7,6 +7,7 @@ import appserver.comm.Message;
 import static appserver.comm.MessageTypes.JOB_REQUEST;
 import static appserver.comm.MessageTypes.REGISTER_SATELLITE;
 import appserver.job.Tool;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,7 +15,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import utils.PropertyHandler;
@@ -31,28 +34,46 @@ public class Satellite extends Thread {
     private ConnectivityInfo satelliteInfo = new ConnectivityInfo();
     private ConnectivityInfo serverInfo = new ConnectivityInfo();
     private HTTPClassLoader classLoader = null;
-    private Hashtable toolsCache = null;
+    private HashMap toolsCache = null;
 
     public Satellite(String satellitePropertiesFile, String classLoaderPropertiesFile, String serverPropertiesFile) {
-
+        
         // read this satellite's properties and populate satelliteInfo object,
         // which later on will be sent to the server
-        // ...
-        
+        Properties satelliteProps = new Properties();
+        try{
+            satelliteProps.load(new FileInputStream(satellitePropertiesFile));
+        }catch(IOException e){
+            System.out.println(e);
+        }
+        this.satelliteInfo.setPort(Integer.parseInt(satelliteProps.getProperty("PORT")));
+        this.satelliteInfo.setName(satelliteProps.getProperty("NAME"));
         
         // read properties of the application server and populate serverInfo object
         // other than satellites, the as doesn't have a human-readable name, so leave it out
-        // ...
-        
+        Properties serverProps = new Properties();
+        try{
+            satelliteProps.load(new FileInputStream(serverPropertiesFile));
+        }catch(IOException e){
+            System.out.println(e);
+        }
+        this.serverInfo.setHost(serverProps.getProperty("HOST"));
+        this.serverInfo.setPort(Integer.parseInt(satelliteProps.getProperty("PORT")));
         
         // read properties of the code server and create class loader
         // -------------------
-        // ...
-
+        Properties codeServerProps = new Properties();
+        try{
+            codeServerProps.load(new FileInputStream(classLoaderPropertiesFile));
+        }catch(IOException e){
+            System.out.println(e);
+        }
+        this.classLoader = new HTTPClassLoader(codeServerProps.getProperty("HOST"),
+                                          Integer.parseInt(codeServerProps.getProperty("PORT")));
         
         // create tools cache
         // -------------------
-        // ...
+        this.toolsCache = new HashMap<String, Tool>();
         
     }
 
