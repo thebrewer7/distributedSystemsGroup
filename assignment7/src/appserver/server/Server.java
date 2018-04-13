@@ -53,7 +53,7 @@ public class Server {
     public void run() {
     // serve clients in server loop ...
     // when a request comes in, a ServerThread object is spawned
-    
+
         try{
             // create ServerSocket
             serverSocket = new ServerSocket(port);

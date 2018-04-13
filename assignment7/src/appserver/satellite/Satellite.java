@@ -8,6 +8,7 @@ import static appserver.comm.MessageTypes.JOB_REQUEST;
 import static appserver.comm.MessageTypes.REGISTER_SATELLITE;
 import appserver.job.Tool;
 import java.io.FileInputStream;
+import appserver.server.Server;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,11 +31,16 @@ import utils.PropertyHandler;
  * @author Dr.-Ing. Wolf-Dieter Otte
  */
 public class Satellite extends Thread {
-
+    // Class Loading Related Objects
     private ConnectivityInfo satelliteInfo = new ConnectivityInfo();
     private ConnectivityInfo serverInfo = new ConnectivityInfo();
     private HTTPClassLoader classLoader = null;
     private HashMap toolsCache = null;
+
+    // Network Related Objects
+    private ServerSocket serverSocket = null;
+    private int port;
+    private InetAddress host = null;
 
     public Satellite(String satellitePropertiesFile, String classLoaderPropertiesFile, String serverPropertiesFile) {
         
@@ -87,7 +93,23 @@ public class Satellite extends Thread {
         
         // create server socket
         // ---------------------------------------------------------------
-        // ...
+        try{
+            // create ServerSocket
+            serverSocket = new ServerSocket(port);
+            
+            // loop that is always listening for new clients
+            // if a clien connects it sends the client to ServerThread
+            while(true){
+                System.out.println("Waiting for clients");
+                
+                //connect to client
+                Socket socket = serverSocket.accept();
+                System.out.println("Connected to a new client");
+                new Thread(new SatelliteThread(socket, this)).start();
+            }
+        } catch(IOException e){
+            
+        }
         
         
         // start taking job requests in a server loop
