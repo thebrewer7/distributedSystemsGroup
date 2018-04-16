@@ -10,7 +10,7 @@ import transactionalserver.lock.Lock;
 public class Transaction {
     // private variables
     private int id;
-    private ArrayList<Lock> locksList = null;
+    private ArrayList<Lock> locksList = new ArrayList<Lock>();
     
     
     /**
@@ -18,6 +18,7 @@ public class Transaction {
      */
     public Transaction(int id){
         this.id = id;
+
     }
     
     //----------- Transaction Methods

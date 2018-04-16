@@ -28,11 +28,11 @@ public class TransactionalServer implements Runnable{
         } catch(IOException e){
             System.out.println(e);
         }
-        
-        accountManager = new AccountManager(100, 100, lockManager);
-        transactionManager = new TransactionManager(accountManager, 
-                lockManager);
+
         lockManager = new LockManager("src/transactionalserver/server/clientproperties.properties");
+        accountManager = new AccountManager(100, 100, lockManager);
+        transactionManager = new TransactionManager(accountManager,
+                lockManager);
     }
     
     public void run(){

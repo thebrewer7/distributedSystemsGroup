@@ -23,7 +23,7 @@ public class AccountManager {
       Constructor
      */
     public AccountManager(int numberAccounts, int initialBalance, 
-            LockManager lockMaanger){
+            LockManager lockManager){
         //create all of the accounts
         accounts = new ArrayList();
        for(int i=0; i<numberAccounts; i++){
