@@ -141,9 +141,11 @@ public class Satellite extends Thread {
         public void run() {
             // setting up object streams
             // reading message
+            ObjectInputStream fromClient = null;
+            ObjectOutputStream toClient = null;
             try{
-                ObjectInputStream fromClient = new ObjectInputStream(jobRequest.getInputStream());
-                ObjectOutputStream toClient = new ObjectOutputStream(jobRequest.getOutputStream());
+                fromClient = new ObjectInputStream(jobRequest.getInputStream());
+                toClient = new ObjectOutputStream(jobRequest.getOutputStream());
                 Message message = (Message)(fromClient.readObject());
             }catch(IOException e){
                 System.out.println(e);
@@ -153,18 +155,30 @@ public class Satellite extends Thread {
             
             switch (message.getType()) {
                 case JOB_REQUEST:
-                    // processing job request
-                    jobRequest();
+                    Job job = (Job)message.getContent();
+                    {
+                        try {
+                            // processing job request
+                            String className = job.getToolName();
+                            Tool tool = getToolObject(className);
+                            toClient.writeObject(tool);
+                        } catch (UnknownToolException ex) {
+                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InstantiationException ex) {
+                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
+                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                     break;
-
+           
                 default:
                     System.err.println("[SatelliteThread.run] Warning: Message type not implemented");
             }
-        }
-        
-        // handle JOB_REQUEST message
-        public void jobRequest(){
-            
         }
     }
 
@@ -174,7 +188,7 @@ public class Satellite extends Thread {
      * otherwise it is loaded dynamically
      */
     public Tool getToolObject(String toolString) throws UnknownToolException, ClassNotFoundException, InstantiationException, IllegalAccessException {
- Tool toolObject = null;
+        Tool toolObject = null;
         //try to get tool object if its in the cache
         toolObject = (Tool) toolsCache.get(toolString);
 
