@@ -71,7 +71,9 @@ public class Satellite extends Thread {
         
             
         this.serverInfo.setHost(serverProps.getProperty("HOST"));
+        System.out.println("[Satellite] Host: " + serverProps.getProperty("HOST"));
         this.serverInfo.setPort(Integer.parseInt(satelliteProps.getProperty("PORT")));
+        System.out.println("[Satellite] Port: " + Integer.parseInt(satelliteProps.getProperty("PORT")));
         
         // read properties of the code server and create class loader
         // -------------------
@@ -104,6 +106,7 @@ public class Satellite extends Thread {
             // create ServerSocket
             serverSocket = new ServerSocket(satelliteInfo.getPort());
         } catch(IOException e){
+            //System.out.println("Satellite: creating serverSocker");
             System.out.println(e);
         }
         
@@ -112,17 +115,19 @@ public class Satellite extends Thread {
         // ---------------------------------------------------------------
         try{
             // loop that is always listening for new clients
-            // if a client connects it sends the client to ServerThread
+            // if a clien connects it sends the client to ServerThread
             while(true){
                 System.out.println("Waiting for clients");
                 
                 //connect to client
+                //System.out.println("Accpeting client socket here");
                 Socket socket = serverSocket.accept();
+                //System.out.println("Client socket accepted");
                 System.out.println("Connected to a new client");
                 new Thread(new SatelliteThread(socket, this)).start();
             }
         } catch(IOException e){
-            System.out.println("Satellite: connecting to client");
+            System.out.println("Satellite: conencting to client");
             System.out.println(e);
         }
     }
@@ -167,6 +172,7 @@ public class Satellite extends Thread {
                             // processing job request
                             String className = job.getToolName();
                             tool = getToolObject(className);
+                            System.out.println("#############Tool: " + tool);
                             toClient.writeObject(tool);
                             
                             //System.out.println("Done with job request");
@@ -210,7 +216,9 @@ public class Satellite extends Thread {
         // check if the wanted Tool Object is already in cache
         if(toolObject == null){
             // the wanted object is not in cache, so we must retrieve it
+            System.out.println("toolString: " + toolString);
             String toolClassString = codeServerProps.getProperty(toolString);
+            
             
             // if it's still null, then it the class doesn't exist
             if(toolClassString == null){
