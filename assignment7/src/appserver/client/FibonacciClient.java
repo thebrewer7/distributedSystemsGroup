@@ -20,7 +20,7 @@ import utils.PropertyHandler;
  *
  * @author Chandler
  */
-public class FibonacciClient implements MessageTypes{
+public class FibonacciClient extends Thread implements MessageTypes{
     // class variables
     int argument;   // the fibonacci number to compute
     Properties properties = null;
@@ -122,18 +122,17 @@ public class FibonacciClient implements MessageTypes{
     }
     
     public static void main(String[] args){
-        if(args.length == 2){
-           int argument = Integer.valueOf(args[1]);
-           for(Integer i=0; i<argument; i++){
+        if(args.length == 1){
+           for(Integer i=46; i>0; i--){
                 FibonacciClient client = new FibonacciClient(args[0], i);
-                client.run();       
+                client.start();       
            }
         }
         else{
-            for(Integer i =0; i<46; i++){
+            for(Integer i =46; i>0; i--){
                 FibonacciClient client = new FibonacciClient("../../config"
                         + "/Server.properties", i);
-                System.out.println("Calculating Fibonacci Number for " + i);
+               client.start();
             }
         }
     }

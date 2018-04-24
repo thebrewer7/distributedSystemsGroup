@@ -22,5 +22,5 @@ public class SatelliteManager {
 
     public ConnectivityInfo getSatelliteForName(String satelliteName) {
         return satellites.get(satelliteName);
-    }s
+    }
 }
