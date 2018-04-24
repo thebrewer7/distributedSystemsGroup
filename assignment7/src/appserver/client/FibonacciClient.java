@@ -122,15 +122,20 @@ public class FibonacciClient implements MessageTypes{
     }
     
     public static void main(String[] args){
-        FibonacciClient client = null;
         if(args.length == 2){
-            client = new FibonacciClient(args[0], Integer.valueOf(args[1]));
+           int argument = Integer.valueOf(args[1]);
+           for(Integer i=0; i<argument; i++){
+                FibonacciClient client = new FibonacciClient(args[0], i);
+                client.run();       
+           }
         }
         else{
-            client = new FibonacciClient("../../config/Server.properties", 5);
-            System.out.println("Calculating Fibonacci Number for 5.");
+            for(Integer i =0; i<46; i++){
+                FibonacciClient client = new FibonacciClient("../../config"
+                        + "/Server.properties", i);
+                System.out.println("Calculating Fibonacci Number for " + i);
+            }
         }
-        client.run();
     }
     
 }
