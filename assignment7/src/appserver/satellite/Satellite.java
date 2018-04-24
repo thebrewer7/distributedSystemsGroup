@@ -43,6 +43,7 @@ public class Satellite extends Thread {
     private ServerSocket serverSocket = null;
     private int port;
     private InetAddress host = null;
+    private String name;
     
     // Other needed variables
     Properties satelliteProps = new Properties();
@@ -57,6 +58,7 @@ public class Satellite extends Thread {
         }catch(IOException e){
             System.out.println(e);
         }
+        
         this.satelliteInfo.setPort(Integer.parseInt(satelliteProps.getProperty("PORT")));
         this.satelliteInfo.setName(satelliteProps.getProperty("NAME"));
         
@@ -95,13 +97,7 @@ public class Satellite extends Thread {
     @Override
     public void run() {
 
-        // register this satellite with the SatelliteManager on the server
-        // ---------------------------------------------------------------
-        // ...
-        
-        
         // create server socket
-        // ---------------------------------------------------------------
         try{
             // create ServerSocket
             serverSocket = new ServerSocket(satelliteInfo.getPort());
@@ -109,8 +105,25 @@ public class Satellite extends Thread {
             //System.out.println("Satellite: creating serverSocker");
             System.out.println(e);
         }
+
+        // register this satellite with the SatelliteManager on the server
+        // ---------------------------------------------------------------
+        Message message = new Message(REGISTER_SATELLITE, satelliteInfo);
+        // send message to server
+        try{
+            // create socket to Application Server
+            InetAddress appHost = InetAddress.getByName(serverInfo.getHost());
+            Socket appServer = new Socket(appHost, serverInfo.getPort());
+            
+            // create OutputStream and send message
+            ObjectOutputStream toAppServer = new ObjectOutputStream(appServer.
+                    getOutputStream());
+            toAppServer.writeObject(message);
+        } catch(IOException e){
+            System.out.println("Registering Satellite");
+            System.out.println(e);
+        }
         
-                
         // start taking job requests in a server loop
         // ---------------------------------------------------------------
         try{
@@ -173,19 +186,13 @@ public class Satellite extends Thread {
                             String className = job.getToolName();
                             tool = getToolObject(className);
                             System.out.println("#############Tool: " + tool);
-                            toClient.writeObject(tool);
+                            Object results = tool.go(job.getParameters());
+                            toClient.writeObject(results);
                             
                             //System.out.println("Done with job request");
-                        } catch (UnknownToolException ex) {
-                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (ClassNotFoundException ex) {
-                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (InstantiationException ex) {
-                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IllegalAccessException ex) {
-                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IOException ex) {
-                            Logger.getLogger(Satellite.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(Satellite.class.getName())
+                                    .log(Level.SEVERE, null, ex);
                         }
                     }
                     break;
