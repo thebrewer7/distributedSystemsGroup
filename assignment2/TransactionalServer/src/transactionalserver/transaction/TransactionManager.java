@@ -45,7 +45,7 @@ public class TransactionManager {
     }
     
     public void runTransactions(Socket client){
-        (new TransactionManagerThread(client)).run();
+        new Thread(new TransactionManagerThread(client)).start();
     }
     
     class TransactionManagerThread implements Runnable{
@@ -140,6 +140,13 @@ public class TransactionManager {
            
            // remove transaction from transaction list
            for(int i=0; i<transactionList.size(); i++){
+               if(transaction == null){
+                   return;
+               }
+               else if(transactionList.get(i) == null){
+                   continue;
+               }
+
                if(transactionList.get(i).getID() == transaction.getID()){
                    transactionList.remove(i);
                    break;
