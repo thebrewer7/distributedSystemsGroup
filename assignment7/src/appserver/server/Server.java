@@ -15,6 +15,8 @@ import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.util.Properties;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -30,6 +32,8 @@ public class Server {
     static ServerSocket serverSocket = null;
     private int port = 0;
     private InetAddress host = null;
+    
+    private ConnectivityInfo satelliteInfo = new ConnectivityInfo();
 
     public Server(String serverPropertiesFile) {
 
@@ -58,7 +62,7 @@ public class Server {
     public void run() {
     // serve clients in server loop ...
     // when a request comes in, a ServerThread object is spawned
-
+    
         try{
             // loop that is always listening for new clients
             // if a clien connects it sends the client to ServerThread
@@ -82,7 +86,7 @@ public class Server {
         ObjectInputStream readFromNet = null;
         ObjectOutputStream writeToNet = null;
         Message message = null;
-
+        
         private ServerThread(Socket client) {
             this.client = client;
         }
@@ -94,7 +98,7 @@ public class Server {
             try{
                 readFromNet = new ObjectInputStream(client.getInputStream());
                 writeToNet = new ObjectOutputStream(client.getOutputStream());
-                message = (Message) (readFromNet.readObject());
+                message = (Message)(readFromNet.readObject());
             }catch(IOException e){
                 System.out.println(e);
             }catch(ClassNotFoundException e){
@@ -106,17 +110,19 @@ public class Server {
                 case REGISTER_SATELLITE:
                     // read satellite info
                     // ...
+                    satelliteInfo = (ConnectivityInfo)message.getContent();
                     
                     // register satellite
                     synchronized (Server.satelliteManager) {
                         // ...
+                        satelliteManager.registerSatellite(satelliteInfo);
                     }
 
                     // add satellite to loadManager
                     synchronized (Server.loadManager) {
                         // ...
+                        loadManager.satelliteAdded(satelliteInfo.getName());
                     }
-
                     break;
 
                 case JOB_REQUEST:
@@ -124,21 +130,35 @@ public class Server {
 
                     String satelliteName = null;
                     synchronized (Server.loadManager) {
+                    try {
                         // get next satellite from load manager
                         // ...
+                        satelliteName = loadManager.nextSatellite();
                         
                         // get connectivity info for next satellite from satellite manager
                         // ...
+                        satelliteManager.getSatelliteForName(satelliteName);
+                    } catch (Exception ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
+                    }
                     Socket satellite = null;
-                    // connect to satellite
+                    // connect to satellite - use 'satellite name'
                     // ...
 
                     // open object streams,
+                 
+                    
+                    
                     // forward message (as is) to satellite,
+                    
+                    
                     // receive result from satellite and
+                    
+                    
                     // write result back to client
+                    
+                    
                     // ...
 
                     break;
@@ -146,6 +166,16 @@ public class Server {
                 default:
                     System.err.println("[ServerThread.run] Warning: Message type not implemented");
             }
+        }
+        
+        public void readSatelliteInfo(Message message){
+            //get the satellites name
+            String satelliteName = satelliteManager.getSatelliteForName(string((message)));
+   
+        }
+
+        private void addSatellite() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
 
