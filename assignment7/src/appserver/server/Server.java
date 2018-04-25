@@ -136,46 +136,50 @@ public class Server {
                         satelliteName = loadManager.nextSatellite();
                         
                         // get connectivity info for next satellite from satellite manager
-                        // ...
-                        satelliteManager.getSatelliteForName(satelliteName);
+                        // 
+                        
+                        satelliteInfo = satelliteManager.getSatelliteForName(satelliteName);
                     } catch (Exception ex) {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     }
                     Socket satellite = null;
-                    // connect to satellite - use 'satellite name'
-                    // ...
+                    {
+                        try {
+                            // connect to satellite - use 'satellite name'
+                            satellite = new Socket(satelliteInfo.getHost(), satelliteInfo.getPort());
 
-                    // open object streams,
-                 
+                            // open object streams,
+                        } catch (IOException ex) {
+                            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                     
-                    
-                    // forward message (as is) to satellite,
-                    
-                    
-                    // receive result from satellite and
-                    
-                    
-                    // write result back to client
-                    
-                    
-                    // ...
+                    //------ forward message (as is) to satellite,
+                    // create object streams w/ satellite
+                    try{
+                        //send message
+                        ObjectOutputStream toSatellite = new ObjectOutputStream(satellite.getOutputStream());
+                        toSatellite.writeObject(message);
+                        
+                        //receive results from satellite
+                        ObjectInputStream fromSatellite = new ObjectInputStream(satellite.getInputStream());
+                        Integer results = (Integer) fromSatellite.readObject();
 
+                        // write result back to client
+                        writeToNet.writeObject(results);
+                        
+                    } catch(IOException e){
+                        System.out.println(e);
+                    } catch(ClassNotFoundException e){
+                        System.out.println(e);
+                    }
+                    
                     break;
 
                 default:
                     System.err.println("[ServerThread.run] Warning: Message type not implemented");
             }
-        }
-        
-        public void readSatelliteInfo(Message message){
-            //get the satellites name
-            String satelliteName = satelliteManager.getSatelliteForName(string((message)));
-   
-        }
-
-        private void addSatellite() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
 
