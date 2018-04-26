@@ -70,12 +70,9 @@ public class Satellite extends Thread {
         }catch(IOException e){
             System.out.println(e);
         }
-        
             
         this.serverInfo.setHost(serverProps.getProperty("HOST"));
-        System.out.println("[Satellite] Host: " + serverProps.getProperty("HOST"));
-        this.serverInfo.setPort(Integer.parseInt(satelliteProps.getProperty("PORT")));
-        System.out.println("[Satellite] Port: " + Integer.parseInt(satelliteProps.getProperty("PORT")));
+        this.serverInfo.setPort(Integer.parseInt(serverProps.getProperty("PORT")));
         
         // read properties of the code server and create class loader
         // -------------------
@@ -102,25 +99,31 @@ public class Satellite extends Thread {
             // create ServerSocket
             serverSocket = new ServerSocket(satelliteInfo.getPort());
         } catch(IOException e){
-            //System.out.println("Satellite: creating serverSocker");
             System.out.println(e);
         }
 
         // register this satellite with the SatelliteManager on the server
         // ---------------------------------------------------------------
         Message message = new Message(REGISTER_SATELLITE, satelliteInfo);
-        // send message to server
+        
+        // get App Server info
+        InetAddress appHost = null;
+        int port = serverInfo.getPort();
         try{
+            appHost = InetAddress.getByName(serverInfo.getHost());
+            
             // create socket to Application Server
-            InetAddress appHost = InetAddress.getByName(serverInfo.getHost());
-            Socket appServer = new Socket(appHost, serverInfo.getPort());
+            Socket appServer = new Socket(appHost, port);
             
             // create OutputStream and send message
             ObjectOutputStream toAppServer = new ObjectOutputStream(appServer.
                     getOutputStream());
             toAppServer.writeObject(message);
+            System.out.println("Sent Reigstration to App Server");
+            
+        } catch(UnknownHostException e){
+            System.out.println(e);
         } catch(IOException e){
-            System.out.println("Registering Satellite");
             System.out.println(e);
         }
         
@@ -140,7 +143,6 @@ public class Satellite extends Thread {
                 new Thread(new SatelliteThread(socket, this)).start();
             }
         } catch(IOException e){
-            System.out.println("Satellite: conencting to client");
             System.out.println(e);
         }
     }
@@ -160,23 +162,25 @@ public class Satellite extends Thread {
 
         @Override
         public void run() {
-            // setting up object streams
-            // reading message
             ObjectInputStream fromClient = null;
             ObjectOutputStream toClient = null;
             Message message = null;
+                    
             try{
+                // setting up object streams
                 fromClient = new ObjectInputStream(jobRequest.getInputStream());
                 toClient = new ObjectOutputStream(jobRequest.getOutputStream());
+                
+                // reading message
                 message = (Message)(fromClient.readObject());
-            }catch(IOException e){
+            } catch(IOException e){
                 System.out.println(e);
-            }catch(ClassNotFoundException e){
+            } catch(ClassNotFoundException e){
                 System.out.println(e);
             }
             
             switch (message.getType()) {
-                case 1:
+                case JOB_REQUEST:
                     //System.out.println("Here is the job request");
                     Job job = (Job)message.getContent();
                     Tool tool = null;
@@ -185,9 +189,12 @@ public class Satellite extends Thread {
                             // processing job request
                             String className = job.getToolName();
                             tool = getToolObject(className);
-                            System.out.println("#############Tool: " + tool);
+                            
                             Object results = tool.go(job.getParameters());
+                            System.out.println("Results are: " + 
+                                    (Integer) results);
                             toClient.writeObject(results);
+                            System.out.println("Sent results");
                             
                             //System.out.println("Done with job request");
                         } catch (Exception ex) {
@@ -198,7 +205,8 @@ public class Satellite extends Thread {
                     break;
            
                 default:
-                    System.err.println("[SatelliteThread.run] Warning: Message type not implemented");
+                    System.out.println("Wrong MessageType: " + message
+                            .getType());
             }
         }
     }
@@ -222,17 +230,16 @@ public class Satellite extends Thread {
 
         // check if the wanted Tool Object is already in cache
         if(toolObject == null){
-            // the wanted object is not in cache, so we must retrieve it
-            System.out.println("toolString: " + toolString);
-            String toolClassString = codeServerProps.getProperty(toolString);
             
+            // the wanted object is not in cache, so we must retrieve it
+            String toolClassString = codeServerProps.getProperty(toolString);
             
             // if it's still null, then it the class doesn't exist
             if(toolClassString == null){
                 throw new UnknownToolException();
             }
             
-            System.out.println("\n Tool's Class: " + toolClassString);
+            System.out.println("Tool's Class: " + toolClassString);
             
             // load the class
             Class toolClass = classLoader.loadClass(toolClassString);

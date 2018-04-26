@@ -39,11 +39,9 @@ public class FibonacciClient extends Thread implements MessageTypes{
         } catch(FileNotFoundException e){
             System.out.println("Could not open server properties file in "
                     + "FibClient");
-            System.out.println(e);
         } catch(IOException e){
             System.out.println("IOException for opening server proprties file "
                     + "in FibClient");
-            System.out.println(e);
         }
         
         //get host and port that the server is running on
@@ -62,63 +60,48 @@ public class FibonacciClient extends Thread implements MessageTypes{
         }catch(IOException e){
             System.out.println("FibonacciClient: Could not connect to server "
                     + "socket");
-            System.out.println(e);
         }
         
         //--------- Create Job & Message
         
         // hard-coded string of Fibonacci tool class name
         String classString = "appserver.job.impl.Fibonacci";
-        // fib number to be computed
-        Integer fibNumber = new Integer(42);
             
         // create job and message
-        Job job = new Job(classString, fibNumber);
+        Job job = new Job(classString, argument);
         Message message = new Message(JOB_REQUEST, job);
             
         //--------- Send Message to Application Server
-        ObjectOutputStream toServer = null;
         // create ObjectOutputStream
         try{
             // send message w/ job request to app server
-            toServer = new ObjectOutputStream(serverSocket.getOutputStream());
-        } catch(IOException e){
-            System.out.println("FibonacciClient: could not create "
-                    + "ObjectOutputStream");
-            System.out.println(e);
-        }
-        
-        // send message
-        try{
+            ObjectOutputStream toServer = new ObjectOutputStream(serverSocket.getOutputStream());
+            
+            // send message
             toServer.writeObject(message);
+            System.out.println("Sent job to server for Fibonacci of "
+                    + argument);
         } catch(IOException e){
-            System.out.println("FibonacciClient: could not send message ");
             System.out.println(e);
         }
         
         // --------- Receive Response From Application Server
         // create ObjectInputStream
-        ObjectInputStream fromServer = null;
         try{
-            fromServer = new ObjectInputStream(serverSocket.getInputStream());
+            ObjectInputStream fromServer = new ObjectInputStream(serverSocket
+                    .getInputStream());
+        
+            // receive message            
+            Integer result = (Integer) fromServer.readObject();
+            System.out.println("\nRESULTS");
+            System.out.println("Fibonacci Number " + argument + " is " + 
+                    result + "\n");
         } catch(IOException e){
-            System.out.println("FibonacciClient: could not create "
-                    + "ObjectInputStream");
+            System.out.println(e);
+        } catch(ClassNotFoundException e){
             System.out.println(e);
         }
         
-        // receive message
-        try{
-            Integer result = (Integer) fromServer.readObject();
-            System.out.println("RESULT: " + result);
-        } catch(IOException e){
-            System.out.println("FibonacciClient: could not receive message ");
-            System.out.println(e);
-        } catch(ClassNotFoundException e){
-            System.out.println("FibonacciClient: wrong class received for "
-                    + "result");
-            System.out.println(e);
-        }
     }
     
     public static void main(String[] args){
